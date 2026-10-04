@@ -10,7 +10,7 @@
   <!-- Premium Modern Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=Outfit:wght@400;600;800&family=Cinzel:wght@700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -27,19 +27,25 @@
         </div>
         <div class="brand-meta">
           <span class="brand-name">FluxFrame</span>
-          <span class="brand-badge">STUDIO</span>
+          <span class="brand-badge">STUDIO PRO</span>
         </div>
       </div>
 
       <div class="navbar-center">
-        <div class="engine-status">
-          <span class="pulse-indicator"></span>
-          <span>In-Browser GPU Acceleration</span>
+        <!-- Quick Preset Dropdown -->
+        <div class="preset-pill-wrap">
+          <span class="preset-label">Preset:</span>
+          <div class="preset-buttons">
+            <button type="button" class="preset-btn" data-preset="product">Product Launch</button>
+            <button type="button" class="preset-btn" data-preset="event">Event Teaser</button>
+            <button type="button" class="preset-btn" data-preset="podcast">Podcast Intro</button>
+            <button type="button" class="preset-btn" data-preset="reels">Story / Reel</button>
+          </div>
         </div>
       </div>
 
       <div class="navbar-actions">
-        <button id="clearBtn" class="btn-ghost" title="Reset to default scene">
+        <button id="clearBtn" class="btn-ghost" title="Reset all settings">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
           <span>Reset</span>
         </button>
@@ -55,19 +61,22 @@
       <!-- LEFT CONTROL PANEL -->
       <aside class="sidebar-panel">
         <div class="panel-section-title">
-          <h2>Scene Settings</h2>
-          <p>Customize visuals, copy, and motion styling</p>
+          <h2>Scene Composer</h2>
+          <p>Configure visuals, typography motion, and audio</p>
         </div>
 
-        <!-- STYLE PRESETS -->
+        <!-- 8 VISUAL STYLES GRID -->
         <div class="form-group">
-          <label class="group-label">Visual Style</label>
+          <div class="label-with-meta">
+            <label class="group-label">Visual Shader Style</label>
+            <span class="badge-count">8 Styles</span>
+          </div>
           <div class="style-grid" id="styleGrid">
             <button type="button" class="style-card active" data-style="silk">
               <div class="style-preview silk-theme"></div>
               <div class="style-info">
                 <span class="title">Silk Flow</span>
-                <span class="desc">Fluid gradient mesh</span>
+                <span class="desc">Luxury gradient mesh</span>
               </div>
             </button>
 
@@ -75,7 +84,7 @@
               <div class="style-preview obsidian-theme"></div>
               <div class="style-info">
                 <span class="title">Obsidian</span>
-                <span class="desc">Deep studio cinematic</span>
+                <span class="desc">Deep studio bokeh</span>
               </div>
             </button>
 
@@ -83,7 +92,7 @@
               <div class="style-preview prism-theme"></div>
               <div class="style-info">
                 <span class="title">Prism Glass</span>
-                <span class="desc">Iridescent glow</span>
+                <span class="desc">Iridescent caustics</span>
               </div>
             </button>
 
@@ -91,7 +100,39 @@
               <div class="style-preview editorial-theme"></div>
               <div class="style-info">
                 <span class="title">Editorial</span>
-                <span class="desc">Modern minimal aura</span>
+                <span class="desc">Architectural beam</span>
+              </div>
+            </button>
+
+            <button type="button" class="style-card" data-style="aurora">
+              <div class="style-preview aurora-theme"></div>
+              <div class="style-info">
+                <span class="title">Cosmic Aurora</span>
+                <span class="desc">Plasma energy ribbons</span>
+              </div>
+            </button>
+
+            <button type="button" class="style-card" data-style="solar">
+              <div class="style-preview solar-theme"></div>
+              <div class="style-info">
+                <span class="title">Solar Glow</span>
+                <span class="desc">Warm horizon rays</span>
+              </div>
+            </button>
+
+            <button type="button" class="style-card" data-style="nebula">
+              <div class="style-preview nebula-theme"></div>
+              <div class="style-info">
+                <span class="title">Quantum Nebula</span>
+                <span class="desc">Volumetric cosmic dust</span>
+              </div>
+            </button>
+
+            <button type="button" class="style-card" data-style="cyber">
+              <div class="style-preview cyber-theme"></div>
+              <div class="style-info">
+                <span class="title">Horizon Wave</span>
+                <span class="desc">Ultra-fine perspective</span>
               </div>
             </button>
           </div>
@@ -100,25 +141,60 @@
             <option value="obsidian">Obsidian</option>
             <option value="prism">Prism Glass</option>
             <option value="editorial">Editorial</option>
+            <option value="aurora">Cosmic Aurora</option>
+            <option value="solar">Solar Glow</option>
+            <option value="nebula">Quantum Nebula</option>
+            <option value="cyber">Horizon Wave</option>
           </select>
+        </div>
+
+        <!-- BADGE / TAG INPUT (OPTIONAL PILL OVERLAY) -->
+        <div class="form-group">
+          <label for="badgeInput" class="group-label">Category Badge (Optional)</label>
+          <div class="input-wrapper">
+            <input type="text" id="badgeInput" maxlength="28" value="FEATURE LAUNCH" placeholder="e.g. VERSION 2.0, KEYNOTE..." />
+          </div>
         </div>
 
         <!-- TEXT CONTENT -->
         <div class="form-group">
           <label for="titleInput" class="group-label">Main Headline</label>
           <div class="input-wrapper">
-            <input type="text" id="titleInput" maxlength="40" value="DESIGN THE FUTURE" placeholder="Enter headline..." />
+            <input type="text" id="titleInput" maxlength="42" value="DESIGN THE FUTURE" placeholder="Enter headline..." />
           </div>
         </div>
 
         <div class="form-group">
           <label for="subtitleInput" class="group-label">Supporting Text</label>
           <div class="input-wrapper">
-            <input type="text" id="subtitleInput" maxlength="65" value="High-fidelity motion graphics rendered in real-time" placeholder="Enter subtitle..." />
+            <input type="text" id="subtitleInput" maxlength="70" value="High-fidelity procedural motion graphics in real-time" placeholder="Enter subtitle..." />
           </div>
         </div>
 
-        <!-- ASPECT RATIO & DURATION (SEGMENTED CONTROLS) -->
+        <!-- TYPOGRAPHY FONT & MOTION CONTROLS -->
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="group-label">Font Family</label>
+            <select id="fontSelect" class="styled-select">
+              <option value="Plus Jakarta Sans" selected>Plus Jakarta Sans (Clean)</option>
+              <option value="Space Grotesk">Space Grotesk (Tech)</option>
+              <option value="Outfit">Outfit (Bold Studio)</option>
+              <option value="Cinzel">Cinzel (Editorial Serif)</option>
+              <option value="Inter">Inter (Minimal)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="group-label">Motion Kinetic Easing</label>
+            <select id="motionSelect" class="styled-select">
+              <option value="fade-rise" selected>Smooth Rise & Fade</option>
+              <option value="scale-pop">Punchy Scale Pop</option>
+              <option value="kinetic-drift">Kinetic Drift Zoom</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- ASPECT RATIO & DURATION -->
         <div class="form-row-2">
           <div class="form-group">
             <label class="group-label">Aspect Ratio</label>
@@ -140,16 +216,18 @@
               <button type="button" class="seg-btn" data-duration="4">4s</button>
               <button type="button" class="seg-btn active" data-duration="5">5s</button>
               <button type="button" class="seg-btn" data-duration="8">8s</button>
+              <button type="button" class="seg-btn" data-duration="10">10s</button>
             </div>
             <select id="durationSelect" class="sr-only" aria-label="Duration Select">
               <option value="4">4s</option>
               <option value="5" selected>5s</option>
               <option value="8">8s</option>
+              <option value="10">10s</option>
             </select>
           </div>
         </div>
 
-        <!-- COLOR PALETTE -->
+        <!-- COLOR PALETTE MOOD -->
         <div class="form-group">
           <label class="group-label">Color Mood</label>
           <div class="palette-container">
@@ -159,8 +237,10 @@
               <button type="button" class="chip" data-color="#f43f5e" style="--chip:#f43f5e" title="Sunset Coral"></button>
               <button type="button" class="chip" data-color="#10b981" style="--chip:#10b981" title="Emerald Glow"></button>
               <button type="button" class="chip" data-color="#f59e0b" style="--chip:#f59e0b" title="Amber Gold"></button>
+              <button type="button" class="chip" data-color="#8b5cf6" style="--chip:#8b5cf6" title="Violet Dream"></button>
+              <button type="button" class="chip" data-color="#ec4899" style="--chip:#ec4899" title="Rose Quartz"></button>
             </div>
-            <div class="custom-color-field" title="Custom color picker">
+            <div class="custom-color-field" title="Pick any custom hex color">
               <input type="color" id="customColorPicker" value="#6366f1" />
               <span>Custom</span>
             </div>
@@ -180,19 +260,20 @@
           </div>
         </div>
 
-        <!-- SOUNDTRACK TOGGLE -->
+        <!-- AUDIO SOUNDSCAPE OPTIONS -->
         <div class="form-group">
-          <label class="group-label">Audio</label>
-          <button type="button" id="audioToggle" class="audio-switch-card active">
-            <div class="switch-icon">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
-            </div>
-            <div class="switch-content">
-              <span class="switch-title">Harmonic Ambient Pad</span>
-              <span class="switch-sub">Generative background sound</span>
-            </div>
-            <span class="switch-badge">ON</span>
-          </button>
+          <label class="group-label">Generative Audio Soundtrack</label>
+          <div class="audio-control-row">
+            <select id="audioSoundSelect" class="styled-select audio-select">
+              <option value="ambient">Harmonic Ambient Pad (Warm C Maj9)</option>
+              <option value="cosmic">Cosmic Space Resonance (Deep Filter)</option>
+              <option value="lofi">Subtle Lo-Fi Drone (Mellow)</option>
+            </select>
+            <button type="button" id="audioToggle" class="audio-switch-btn active" title="Toggle sound mute/unmute">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+              <span id="audioStatusText">ON</span>
+            </button>
+          </div>
         </div>
       </aside>
 
