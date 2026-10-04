@@ -8,14 +8,15 @@
 
 An autonomous, GPU-accelerated video generator that runs entirely inside your browser. No server rendering, no cloud upload, and zero video editing timelines required.
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-flux--frame.vercel.app-10b981?style=for-the-badge&logo=vercel)](https://flux-frame.vercel.app/)
 [![Developed by JOJIN JOHN](https://img.shields.io/badge/Developer-JOJIN%20JOHN-6366f1?style=for-the-badge&logo=github)](https://github.com/jojin1709)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
 [![Zero Backend](https://img.shields.io/badge/Backend-100%25%20Client--Side-emerald?style=for-the-badge)](https://github.com/jojin1709/motion-canvas-studio-)
-[![Vercel Deployment](https://img.shields.io/badge/Deploy%20with-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/new)
 
-<p><strong>Launch Locally in 5 Seconds</strong></p>
+<p><strong><a href="https://flux-frame.vercel.app/" target="_blank">🚀 Try Live Demo: flux-frame.vercel.app</a></strong></p>
 
 ```bash
+# Or run locally in 5 seconds
 npx serve .
 ```
 
