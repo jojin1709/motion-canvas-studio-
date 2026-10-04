@@ -807,7 +807,7 @@ async function generateSceneWithAI(prompt) {
   if (cfAccountId && cfApiToken) {
     try {
       showToast('☁️ Calling Cloudflare Workers AI edge...');
-      const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${cfAccountId}/ai/run/@cf/meta/llama-3.3-70b-instruct`, {
+      const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${cfAccountId}/ai/run/@cf/meta/llama-3-8b-instruct`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${cfApiToken}`,

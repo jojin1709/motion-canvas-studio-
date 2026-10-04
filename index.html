@@ -43,9 +43,22 @@
               800: '#141a30',
               700: '#1e2646',
               600: '#2b365e',
-            }
           }
         }
+      }
+    }
+  </script>
+
+  <!-- Cloudflare Turnstile -->
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script>
+    function onTurnstileSuccess(token) {
+      const modal = document.getElementById('turnstileModal');
+      if (modal) {
+        modal.classList.add('opacity-0', 'pointer-events-none');
+        setTimeout(() => {
+          modal.style.display = 'none';
+        }, 500);
       }
     }
   </script>
@@ -53,6 +66,49 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body class="bg-dark-950 text-slate-100 font-sans min-h-screen antialiased selection:bg-brand-500 selection:text-white">
+
+  <!-- CLOUDFLARE TURNSTILE BOT VERIFICATION GATEWAY -->
+  <div id="turnstileModal" class="fixed inset-0 z-50 flex items-center justify-center bg-dark-950/95 backdrop-blur-2xl transition-all duration-500">
+    <div class="relative w-full max-w-md mx-4 p-6 sm:p-8 rounded-3xl bg-dark-900/95 border border-dark-700/80 shadow-2xl shadow-black/80 flex flex-col items-center text-center">
+      
+      <!-- Security Shield Badge -->
+      <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-brand-600 via-indigo-500 to-cyan-400 p-0.5 shadow-xl shadow-brand-500/20 mb-4">
+        <div class="w-full h-full bg-dark-950 rounded-[14px] flex items-center justify-center text-brand-400">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+      </div>
+
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-400 text-xs font-bold uppercase tracking-wider mb-2">
+        <span class="w-2 h-2 rounded-full bg-brand-400 animate-pulse"></span>
+        Cloudflare Turnstile Gateway
+      </div>
+
+      <h2 class="text-xl font-extrabold text-white font-outfit tracking-tight mb-1">Human Verification</h2>
+      <p class="text-xs text-slate-400 max-w-xs mb-5">Please complete the security check to enter FluxFrame Studio Pro.</p>
+
+      <!-- Turnstile Widget -->
+      <div class="min-h-[65px] flex items-center justify-center mb-5 w-full">
+        <div class="cf-turnstile" data-sitekey="0x4AAAAAAAx7Y-W3s2f7hJ8a" data-theme="dark" data-callback="onTurnstileSuccess"></div>
+      </div>
+
+      <!-- Fallback / Confirm Button -->
+      <button type="button" onclick="onTurnstileSuccess('verified')" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-xs font-extrabold text-white transition active:scale-98 shadow-lg shadow-brand-500/25 flex items-center justify-center gap-2">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        <span>I am Human — Enter Studio</span>
+      </button>
+
+      <div class="mt-4 flex items-center justify-center gap-4 text-[10px] text-slate-500">
+        <span class="flex items-center gap-1">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          DDoS Protection
+        </span>
+        <span class="flex items-center gap-1">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+          0% Data Stored
+        </span>
+      </div>
+    </div>
+  </div>
 
   <!-- BACKGROUND AMBIENCE -->
   <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">

@@ -1,0 +1,13 @@
+# Environment variables (private keys & tokens)
+.env
+.env.local
+.env.*.local
+
+# Dependencies
+node_modules/
+.wrangler/
+
+# Build and logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

@@ -33,13 +33,13 @@ Required JSON schema:
   "motion": "fade-rise" | "scale-pop" | "kinetic-drift" | "glitch-flash"
 }`;
 
-    const response = await env.AI.run("@cf/meta/llama-3.3-70b-instruct", {
+    const response = await env.AI.run("@cf/meta/llama-3.2-3b-instruct", {
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: `Generate video scene design for: ${prompt}` }
       ],
-      temperature: 0.6,
-      max_tokens: 300
+      temperature: 0.5,
+      max_tokens: 250
     });
 
     return new Response(JSON.stringify(response), {
