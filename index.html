@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#070913" />
-  <meta name="description" content="FluxFrame Studio Pro — GPU-accelerated motion video generator powered by WebGL, Web Audio, and Tailwind CSS." />
+  <meta name="description" content="FluxFrame Studio Pro — GPU-accelerated motion video generator powered by WebGL, Cloudflare Workers AI, Web Audio, and Tailwind CSS." />
   <title>FluxFrame Studio — Procedural Motion Video Generator</title>
 
   <!-- Google Fonts -->
@@ -80,12 +80,19 @@
         <div class="relative w-full flex items-center">
           <svg class="w-4 h-4 text-amber-400 absolute left-3 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
           <input type="text" id="aiPromptInput" placeholder="AI Prompt: 'Cyberpunk tournament', 'Luxury keynote', 'Make it cool'..." class="w-full bg-dark-950/90 border border-dark-700/80 rounded-xl pl-9 pr-24 py-1.5 text-xs text-white focus:border-brand-500 focus:outline-none placeholder:text-slate-500 transition" />
-          <button type="button" id="aiGenerateBtn" class="absolute right-1.5 px-3 py-1 rounded-lg bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-[11px] font-extrabold text-white transition active:scale-95 shadow-md">Generate ✨</button>
+          <button type="button" id="aiGenerateBtn" class="absolute right-1.5 px-3 py-1 rounded-lg bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-[11px] font-extrabold text-white transition active:scale-95 shadow-md flex items-center gap-1">
+            <span id="aiBtnLabel">Generate ✨</span>
+          </button>
         </div>
       </div>
 
       <!-- ACTIONS -->
       <div class="flex items-center gap-2 sm:gap-2.5">
+        <button id="aiConfigModalBtn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-dark-800/80 hover:bg-dark-700 border border-dark-700 text-slate-300 hover:text-white text-xs font-bold transition" title="Cloudflare Workers AI Settings">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-amber-400"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+          <span class="hidden sm:inline">Cloudflare AI</span>
+        </button>
+
         <button id="shareLinkBtn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-dark-800/80 hover:bg-dark-700 border border-dark-700 text-slate-300 hover:text-white text-xs font-bold transition" title="Copy shareable link">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
           <span class="hidden sm:inline">Share URL</span>
@@ -117,7 +124,7 @@
         <div class="flex items-center justify-between pb-3 border-b border-dark-700/50">
           <div>
             <h2 class="text-base font-extrabold tracking-tight text-white font-outfit">Scene Designer</h2>
-            <p class="text-xs text-slate-400">8 Visual Shaders, AI Prompts & Audio Engine</p>
+            <p class="text-xs text-slate-400">8 Visual Shaders, Cloudflare AI & Audio Engine</p>
           </div>
           <!-- Quick Preset Dropdown -->
           <div class="flex items-center gap-1.5">
@@ -468,7 +475,7 @@
             <span>•</span>
             <span class="flex items-center gap-1">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-emerald-400"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-              Zero Cloud Server
+              Zero Server Storage
             </span>
           </div>
           <div class="font-bold text-emerald-400 flex items-center gap-1.5" id="renderStatus">
@@ -478,6 +485,44 @@
       </section>
 
     </main>
+  </div>
+
+  <!-- CLOUDFLARE WORKERS AI CONFIG MODAL -->
+  <div id="aiConfigModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-200">
+    <div class="bg-dark-900 border border-dark-700/80 rounded-3xl p-6 max-w-md w-full shadow-2xl flex flex-col gap-4 transform scale-95 transition-transform duration-200" id="aiModalCard">
+      <div class="flex items-center justify-between border-b border-dark-700/60 pb-3">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+          </div>
+          <div>
+            <h3 class="font-bold text-sm text-white font-outfit">Cloudflare Workers AI</h3>
+            <p class="text-[11px] text-slate-400">Zero data retention edge AI inference</p>
+          </div>
+        </div>
+        <button id="closeAiModalBtn" class="text-slate-400 hover:text-white text-sm font-bold">✕</button>
+      </div>
+
+      <div class="text-xs text-slate-300 leading-relaxed bg-dark-950/60 p-3 rounded-xl border border-dark-700/50">
+        <strong class="text-white block mb-1">🔒 100% Privacy & Zero Server Storage:</strong>
+        Your credentials and generated videos are kept solely in your browser memory and never stored in any database.
+      </div>
+
+      <div class="flex flex-col gap-3 text-xs">
+        <div>
+          <label class="font-bold text-slate-400 block mb-1">Cloudflare Account ID (Optional)</label>
+          <input type="text" id="cfAccountIdInput" placeholder="e.g. 9b87f6..." class="w-full bg-dark-950 border border-dark-700 rounded-xl px-3 py-2 text-xs text-white focus:border-brand-500 focus:outline-none placeholder:text-slate-600" />
+        </div>
+        <div>
+          <label class="font-bold text-slate-400 block mb-1">Cloudflare API Token (Optional)</label>
+          <input type="password" id="cfApiTokenInput" placeholder="Workers AI Read/Write Token" class="w-full bg-dark-950 border border-dark-700 rounded-xl px-3 py-2 text-xs text-white focus:border-brand-500 focus:outline-none placeholder:text-slate-600" />
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-2 border-t border-dark-700/60">
+        <button id="saveAiConfigBtn" class="px-4 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs transition">Save Settings</button>
+      </div>
+    </div>
   </div>
 
   <!-- TOAST NOTIFICATION (POPUP) -->

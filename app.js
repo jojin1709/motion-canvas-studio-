@@ -46,9 +46,19 @@ const snapshotBtn = document.getElementById('snapshotBtn');
 const shareLinkBtn = document.getElementById('shareLinkBtn');
 const aiPromptInput = document.getElementById('aiPromptInput');
 const aiGenerateBtn = document.getElementById('aiGenerateBtn');
+const aiBtnLabel = document.getElementById('aiBtnLabel');
 const quickPresetSelect = document.getElementById('quickPresetSelect');
 const toast = document.getElementById('toast');
 const toastMessage = document.getElementById('toastMessage');
+
+// Cloudflare AI Modal Elements
+const aiConfigModalBtn = document.getElementById('aiConfigModalBtn');
+const aiConfigModal = document.getElementById('aiConfigModal');
+const aiModalCard = document.getElementById('aiModalCard');
+const closeAiModalBtn = document.getElementById('closeAiModalBtn');
+const saveAiConfigBtn = document.getElementById('saveAiConfigBtn');
+const cfAccountIdInput = document.getElementById('cfAccountIdInput');
+const cfApiTokenInput = document.getElementById('cfApiTokenInput');
 
 // State
 let accent = '#6366f1';
@@ -65,6 +75,12 @@ let userLogo = null;
 let customAudioElement = null;
 let audioEnabled = true;
 let audioCtx = null;
+
+// Cloudflare Settings (Client LocalStorage Only — 0% server storage)
+let cfAccountId = localStorage.getItem('ff_cf_account_id') || '';
+let cfApiToken = localStorage.getItem('ff_cf_api_token') || '';
+if (cfAccountIdInput) cfAccountIdInput.value = cfAccountId;
+if (cfApiTokenInput) cfApiTokenInput.value = cfApiToken;
 
 // ==========================================
 // 8 ADVANCED GLSL PROCEDURAL SHADERS
@@ -445,7 +461,6 @@ function createGenerativeAudioNode(destination) {
 
   const soundType = audioSoundSelect.value || 'ambient';
   
-  // Custom audio playback
   if (soundType === 'custom' && customAudioElement) {
     try {
       const source = audioCtx.createMediaElementSource(customAudioElement);
@@ -638,17 +653,14 @@ function render(time) {
 
     const pillY = h * 0.36 + contentOffsetY + animOffsetY;
 
-    // Glass pill background
     ctx.fillStyle = 'rgba(10, 14, 28, 0.82)';
     drawRoundedRect(ctx, pillX, pillY, pillW, pillH, 14 * scale);
     ctx.fill();
 
-    // Accent border
     ctx.strokeStyle = accent;
     ctx.lineWidth = 1.8 * scale;
     ctx.stroke();
 
-    // Text inside pill
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillStyle = '#ffffff';
@@ -754,10 +766,81 @@ function updateSettings() {
 }
 
 // ==========================================
-// AI PROMPT-TO-SCENE SMART ASSISTANT
+// CLOUDFLARE WORKERS AI & LOCAL GENERATOR
 // ==========================================
-function generateSceneFromPrompt(prompt) {
+async function generateSceneWithAI(prompt) {
   if (!prompt || !prompt.trim()) return;
+  aiBtnLabel.textContent = 'Thinking... ⏳';
+  aiGenerateBtn.disabled = true;
+
+  // If Cloudflare Account ID & Token are provided in LocalStorage, query Cloudflare Workers AI edge!
+  if (cfAccountId && cfApiToken) {
+    try {
+      showToast('☁️ Calling Cloudflare Workers AI edge...');
+      const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${cfAccountId}/ai/run/@cf/meta/llama-3.3-70b-instruct`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${cfApiToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          messages: [
+            {
+              role: 'system',
+              content: 'You are an AI motion designer. Return ONLY a JSON object with: { "badge": string, "title": string (max 4 words), "subtitle": string, "style": "silk"|"solar"|"aurora"|"cyber"|"chrome"|"obsidian"|"prism"|"warp", "accent": hex_color, "font": "Plus Jakarta Sans"|"Space Grotesk"|"Outfit"|"Syne"|"Cinzel"|"JetBrains Mono", "motion": "fade-rise"|"scale-pop"|"kinetic-drift"|"glitch-flash" }'
+            },
+            {
+              role: 'user',
+              content: `Create scene for: ${prompt}`
+            }
+          ]
+        })
+      });
+
+      const data = await response.json();
+      if (data.result && data.result.response) {
+        const text = data.result.response;
+        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          const parsed = JSON.parse(jsonMatch[0]);
+          applyParsedScene(parsed, prompt);
+          aiBtnLabel.textContent = 'Generate ✨';
+          aiGenerateBtn.disabled = false;
+          return;
+        }
+      }
+    } catch (err) {
+      console.warn('Cloudflare Workers AI edge note:', err);
+    }
+  }
+
+  // Instant Local AI Fallback (100% Client-Side & Private)
+  generateSceneFromPrompt(prompt);
+  aiBtnLabel.textContent = 'Generate ✨';
+  aiGenerateBtn.disabled = false;
+}
+
+function applyParsedScene(parsed, prompt) {
+  if (parsed.badge) badgeInput.value = parsed.badge.toUpperCase();
+  if (parsed.title) titleInput.value = parsed.title.toUpperCase();
+  if (parsed.subtitle) subtitleInput.value = parsed.subtitle;
+  if (parsed.style && shaders[parsed.style]) styleSelect.value = parsed.style;
+  if (parsed.font) fontSelect.value = parsed.font;
+  if (parsed.motion) motionSelect.value = parsed.motion;
+  if (parsed.accent) {
+    accent = parsed.accent;
+    customColorPicker.value = accent;
+    document.documentElement.style.setProperty('--accent', accent);
+  }
+
+  document.querySelectorAll('.style-card').forEach(c => c.classList.toggle('active', c.dataset.style === styleSelect.value));
+  document.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c.dataset.color === accent));
+  
+  showToast(`✨ Generated: "${parsed.title || prompt}"`);
+  updateSettings();
+}
+
+function generateSceneFromPrompt(prompt) {
   const p = prompt.toLowerCase();
 
   let selectedStyle = 'silk';
@@ -834,28 +917,48 @@ function generateSceneFromPrompt(prompt) {
     subtitle = 'Deep conversations with the pioneers of tech';
   }
 
-  // Apply generated scene
-  badgeInput.value = badge;
-  titleInput.value = title;
-  subtitleInput.value = subtitle;
-  styleSelect.value = selectedStyle;
-  fontSelect.value = selectedFont;
-  motionSelect.value = selectedMotion;
-  accent = selectedAccent;
-  customColorPicker.value = accent;
-  document.documentElement.style.setProperty('--accent', accent);
-
-  document.querySelectorAll('.style-card').forEach(c => c.classList.toggle('active', c.dataset.style === selectedStyle));
-  document.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c.dataset.color === accent));
-  
-  showToast(`✨ Generated scene for "${prompt.slice(0, 20)}..."`);
-  updateSettings();
+  applyParsedScene({
+    badge,
+    title,
+    subtitle,
+    style: selectedStyle,
+    font: selectedFont,
+    motion: selectedMotion,
+    accent: selectedAccent
+  }, prompt);
 }
 
 // AI Button & Enter key
-aiGenerateBtn.addEventListener('click', () => generateSceneFromPrompt(aiPromptInput.value));
+aiGenerateBtn.addEventListener('click', () => generateSceneWithAI(aiPromptInput.value));
 aiPromptInput.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') generateSceneFromPrompt(aiPromptInput.value);
+  if (e.key === 'Enter') generateSceneWithAI(aiPromptInput.value);
+});
+
+// Cloudflare AI Modal Controls
+aiConfigModalBtn.addEventListener('click', () => {
+  aiConfigModal.classList.remove('opacity-0', 'pointer-events-none');
+  aiModalCard.classList.remove('scale-95');
+  aiModalCard.classList.add('scale-100');
+});
+
+function closeAiModal() {
+  aiConfigModal.classList.add('opacity-0', 'pointer-events-none');
+  aiModalCard.classList.remove('scale-100');
+  aiModalCard.classList.add('scale-95');
+}
+
+closeAiModalBtn.addEventListener('click', closeAiModal);
+aiConfigModal.addEventListener('click', (e) => {
+  if (e.target === aiConfigModal) closeAiModal();
+});
+
+saveAiConfigBtn.addEventListener('click', () => {
+  cfAccountId = cfAccountIdInput.value.trim();
+  cfApiToken = cfApiTokenInput.value.trim();
+  localStorage.setItem('ff_cf_account_id', cfAccountId);
+  localStorage.setItem('ff_cf_api_token', cfApiToken);
+  closeAiModal();
+  showToast(cfAccountId ? '☁️ Cloudflare Workers AI configured!' : '⚙️ Saved settings');
 });
 
 // ==========================================
