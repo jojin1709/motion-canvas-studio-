@@ -1,204 +1,278 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#090a0f" />
-  <meta name="description" content="FluxFrame — Create stunning studio-grade motion graphics and videos directly in your browser." />
-  <title>FluxFrame — Studio Motion Video Generator</title>
-  
-  <!-- Premium Modern Fonts -->
+  <meta name="theme-color" content="#070913" />
+  <meta name="description" content="FluxFrame Studio — Advanced GPU-accelerated motion video & graphic generator powered by WebGL, Web Audio, and Tailwind CSS." />
+  <title>FluxFrame Studio — Procedural Motion Video Generator</title>
+
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=Outfit:wght@400;600;800&family=Cinzel:wght@700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&family=Outfit:wght@400;600;700;800;900&family=Cinzel:wght@700;800&family=Syne:wght@700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+            space: ['"Space Grotesk"', 'sans-serif'],
+            outfit: ['"Outfit"', 'sans-serif'],
+            syne: ['"Syne"', 'sans-serif'],
+            cinzel: ['"Cinzel"', 'serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              400: '#818cf8',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            },
+            dark: {
+              950: '#06070d',
+              900: '#0a0d18',
+              850: '#0e1222',
+              800: '#141a30',
+              700: '#1e2646',
+              600: '#2b365e',
+            }
+          },
+          boxShadow: {
+            'glow-indigo': '0 0 25px -5px rgba(99, 102, 241, 0.45)',
+            'glow-cyan': '0 0 25px -5px rgba(6, 182, 212, 0.45)',
+            'glow-rose': '0 0 25px -5px rgba(244, 63, 94, 0.45)',
+            'glow-amber': '0 0 25px -5px rgba(245, 158, 11, 0.45)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
-  <div class="app-layout">
-    <!-- TOP NAVIGATION -->
-    <header class="navbar">
-      <div class="brand">
-        <div class="logo-mark">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-            <polyline points="2 17 12 22 22 17"></polyline>
-            <polyline points="2 12 12 17 22 12"></polyline>
-          </svg>
+<body class="bg-dark-950 text-slate-100 font-sans min-h-screen antialiased selection:bg-brand-500 selection:text-white">
+
+  <!-- BACKGROUND GLOW AMBIENCE -->
+  <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+    <div class="absolute -top-40 left-1/3 w-[600px] h-[600px] bg-brand-600/10 rounded-full blur-[140px]"></div>
+    <div class="absolute -bottom-40 right-1/4 w-[600px] h-[600px] bg-cyan-600/10 rounded-full blur-[140px]"></div>
+  </div>
+
+  <div class="relative z-10 max-w-[1720px] mx-auto p-3 sm:p-5 lg:p-6 flex flex-col gap-4 sm:gap-6 min-h-screen">
+    
+    <!-- TOP NAVIGATION BAR -->
+    <header class="h-16 px-4 sm:px-6 rounded-2xl bg-dark-900/80 backdrop-blur-xl border border-dark-700/60 shadow-2xl flex items-center justify-between gap-4">
+      <!-- BRAND LOGO -->
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 via-indigo-500 to-cyan-400 flex items-center justify-center text-white shadow-glow-indigo">
+          <i data-lucide="layers" class="w-5 h-5"></i>
         </div>
-        <div class="brand-meta">
-          <span class="brand-name">FluxFrame</span>
-          <span class="brand-badge">STUDIO PRO</span>
+        <div class="flex items-center gap-2">
+          <span class="font-outfit font-extrabold text-lg tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">FluxFrame</span>
+          <span class="text-[10px] font-bold tracking-wider px-2 py-0.5 rounded-full bg-brand-500/15 border border-brand-500/30 text-brand-400">STUDIO PRO</span>
         </div>
       </div>
 
-      <div class="navbar-center">
-        <!-- Quick Preset Dropdown -->
-        <div class="preset-pill-wrap">
-          <span class="preset-label">Preset:</span>
-          <div class="preset-buttons">
-            <button type="button" class="preset-btn" data-preset="product">Product Launch</button>
-            <button type="button" class="preset-btn" data-preset="event">Event Teaser</button>
-            <button type="button" class="preset-btn" data-preset="podcast">Podcast Intro</button>
-            <button type="button" class="preset-btn" data-preset="reels">Story / Reel</button>
-          </div>
-        </div>
+      <!-- PRESET TEMPLATES -->
+      <div class="hidden xl:flex items-center gap-1.5 bg-dark-950/70 p-1.5 rounded-xl border border-dark-700/50 text-xs">
+        <span class="text-slate-400 font-bold px-2 flex items-center gap-1">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-400"></i> Presets:
+        </span>
+        <button type="button" class="preset-btn px-3 py-1 rounded-lg text-slate-300 font-semibold hover:bg-dark-800 hover:text-white transition" data-preset="launch">🚀 Product Launch</button>
+        <button type="button" class="preset-btn px-3 py-1 rounded-lg text-slate-300 font-semibold hover:bg-dark-800 hover:text-white transition" data-preset="solar">🔥 Solar Flare</button>
+        <button type="button" class="preset-btn px-3 py-1 rounded-lg text-slate-300 font-semibold hover:bg-dark-800 hover:text-white transition" data-preset="cyber">⚡ Cyber Grid</button>
+        <button type="button" class="preset-btn px-3 py-1 rounded-lg text-slate-300 font-semibold hover:bg-dark-800 hover:text-white transition" data-preset="aurora">🌌 Cosmic Aurora</button>
+        <button type="button" class="preset-btn px-3 py-1 rounded-lg text-slate-300 font-semibold hover:bg-dark-800 hover:text-white transition" data-preset="reels">📱 9:16 Reel</button>
       </div>
 
-      <div class="navbar-actions">
-        <button id="clearBtn" class="btn-ghost" title="Reset all settings">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+      <!-- ACTIONS -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-lg shadow-emerald-400"></span>
+          <span>100% Client GPU</span>
+        </div>
+        
+        <button id="clearBtn" class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-dark-800/80 hover:bg-dark-700 border border-dark-700 text-slate-300 hover:text-white text-xs font-bold transition">
+          <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
           <span>Reset</span>
         </button>
-        <button id="exportBtn" class="btn-primary">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+
+        <button id="exportBtn" class="flex items-center gap-2 px-5 py-2 rounded-xl bg-white hover:bg-slate-100 text-dark-950 text-xs font-extrabold shadow-lg shadow-white/10 transition active:scale-95">
+          <i data-lucide="download" class="w-4 h-4"></i>
           <span id="exportBtnText">Export Video</span>
         </button>
       </div>
     </header>
 
-    <!-- MAIN STUDIO WORKSPACE -->
-    <main class="studio-container">
-      <!-- LEFT CONTROL PANEL -->
-      <aside class="sidebar-panel">
-        <div class="panel-section-title">
-          <h2>Scene Composer</h2>
-          <p>Configure visuals, typography motion, and audio</p>
+    <!-- MAIN WORKSPACE GRID -->
+    <main class="grid grid-cols-1 lg:grid-cols-12 gap-5 flex-1 items-start">
+      
+      <!-- CONTROLS SIDEBAR (5 COLS) -->
+      <aside class="lg:col-span-5 bg-dark-900/90 backdrop-blur-xl border border-dark-700/60 rounded-3xl p-5 sm:p-6 shadow-2xl flex flex-col gap-5 max-h-[calc(100vh-120px)] overflow-y-auto custom-scrollbar">
+        
+        <div class="flex items-center justify-between pb-3 border-b border-dark-700/50">
+          <div>
+            <h2 class="text-base font-extrabold tracking-tight text-white font-outfit">Scene Designer</h2>
+            <p class="text-xs text-slate-400">Procedural graphics, kinetic typography & audio</p>
+          </div>
+          <span class="px-2.5 py-1 rounded-lg bg-brand-500/15 border border-brand-500/30 text-brand-400 text-[11px] font-bold">8 Visual Shaders</span>
         </div>
 
-        <!-- 8 VISUAL STYLES GRID -->
-        <div class="form-group">
-          <div class="label-with-meta">
-            <label class="group-label">Visual Shader Style</label>
-            <span class="badge-count">8 Styles</span>
+        <!-- 8 VISUAL SHADERS -->
+        <div class="flex flex-col gap-2.5">
+          <label class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+            <i data-lucide="palette" class="w-3.5 h-3.5 text-brand-400"></i> Visual Shader System
+          </label>
+          <div class="grid grid-cols-2 gap-2" id="styleGrid">
+            <!-- 1. Silk Flow -->
+            <button type="button" class="style-card active group" data-style="silk">
+              <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-600 via-blue-500 to-cyan-400 border border-white/20 shadow-md flex-shrink-0"></div>
+              <div class="text-left overflow-hidden">
+                <div class="text-xs font-bold text-white group-hover:text-brand-400 truncate">Silk Flow</div>
+                <div class="text-[10px] text-slate-400 truncate">Apple fluid mesh</div>
+              </div>
+            </button>
+
+            <!-- 2. Solar Flare -->
+            <button type="button" class="style-card group" data-style="solar">
+              <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-amber-500 via-rose-500 to-yellow-300 border border-white/20 shadow-md flex-shrink-0"></div>
+              <div class="text-left overflow-hidden">
+                <div class="text-xs font-bold text-white group-hover:text-amber-400 truncate">Solar Flare</div>
+                <div class="text-[10px] text-slate-400 truncate">Fiery golden rays</div>
+              </div>
+            </button>
+
+            <!-- 3. Cosmic Aurora -->
+            <button type="button" class="style-card group" data-style="aurora">
+              <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-emerald-500 via-teal-400 to-cyan-500 border border-white/20 shadow-md flex-shrink-0"></div>
+              <div class="text-left overflow-hidden">
+                <div class="text-xs font-bold text-white group-hover:text-emerald-400 truncate">Cosmic Aurora</div>
+                <div class="text-[10px] text-slate-400 truncate">Northern plasma</div>
+              </div>
+            </button>
+
+            <!-- 4. Cyber Wave Grid -->
+            <button type="button" class="style-card group" data-style="cyber">
+              <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-pink-600 via-purple-600 to-cyan-400 border border-white/20 shadow-md flex-shrink-0"></div>
+              <div class="text-left overflow-hidden">
+                <div class="text-xs font-bold text-white group-hover:text-pink-400 truncate">Cyber Wave</div>
+                <div class="text-[10px] text-slate-400 truncate">Synthwave 3D grid</div>
+              </div>
+            </button>
+
+            <!-- 5. Liquid Chrome -->
+            <button type="button" class="style-card group" data-style="chrome">
+              <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-slate-600 via-slate-300 to-slate-100 border border-white/20 shadow-md flex-shrink-0"></div>
+              <div class="text-left overflow-hidden">
+                <div class="text-xs font-bold text-white group-hover:text-cyan-400 truncate">Liquid Chrome</div>
+                <div class="text-[10px] text-slate-400 truncate">Metallic ripples</div>
+              </div>
+            </button>
+
+            <!-- 6. Obsidian Darkroom -->
+            <button type="button" class="style-card group" data-style="obsidian">
+              <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-slate-900 via-slate-800 to-indigo-950 border border-white/20 shadow-md flex-shrink-0"></div>
+              <div class="text-left overflow-hidden">
+                <div class="text-xs font-bold text-white group-hover:text-indigo-400 truncate">Obsidian</div>
+                <div class="text-[10px] text-slate-400 truncate">Cinematic bokeh</div>
+              </div>
+            </button>
+
+            <!-- 7. Prism Glass -->
+            <button type="button" class="style-card group" data-style="prism">
+              <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-rose-500 via-violet-500 to-sky-400 border border-white/20 shadow-md flex-shrink-0"></div>
+              <div class="text-left overflow-hidden">
+                <div class="text-xs font-bold text-white group-hover:text-violet-400 truncate">Prism Glass</div>
+                <div class="text-[10px] text-slate-400 truncate">Holographic optics</div>
+              </div>
+            </button>
+
+            <!-- 8. Warp Speed -->
+            <button type="button" class="style-card group" data-style="warp">
+              <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-900 via-indigo-600 to-cyan-300 border border-white/20 shadow-md flex-shrink-0"></div>
+              <div class="text-left overflow-hidden">
+                <div class="text-xs font-bold text-white group-hover:text-cyan-400 truncate">Warp Speed</div>
+                <div class="text-[10px] text-slate-400 truncate">Hyperspace tunnel</div>
+              </div>
+            </button>
           </div>
-          <div class="style-grid" id="styleGrid">
-            <button type="button" class="style-card active" data-style="silk">
-              <div class="style-preview silk-theme"></div>
-              <div class="style-info">
-                <span class="title">Silk Flow</span>
-                <span class="desc">Luxury gradient mesh</span>
-              </div>
-            </button>
 
-            <button type="button" class="style-card" data-style="obsidian">
-              <div class="style-preview obsidian-theme"></div>
-              <div class="style-info">
-                <span class="title">Obsidian</span>
-                <span class="desc">Deep studio bokeh</span>
-              </div>
-            </button>
-
-            <button type="button" class="style-card" data-style="prism">
-              <div class="style-preview prism-theme"></div>
-              <div class="style-info">
-                <span class="title">Prism Glass</span>
-                <span class="desc">Iridescent caustics</span>
-              </div>
-            </button>
-
-            <button type="button" class="style-card" data-style="editorial">
-              <div class="style-preview editorial-theme"></div>
-              <div class="style-info">
-                <span class="title">Editorial</span>
-                <span class="desc">Architectural beam</span>
-              </div>
-            </button>
-
-            <button type="button" class="style-card" data-style="aurora">
-              <div class="style-preview aurora-theme"></div>
-              <div class="style-info">
-                <span class="title">Cosmic Aurora</span>
-                <span class="desc">Plasma energy ribbons</span>
-              </div>
-            </button>
-
-            <button type="button" class="style-card" data-style="solar">
-              <div class="style-preview solar-theme"></div>
-              <div class="style-info">
-                <span class="title">Solar Glow</span>
-                <span class="desc">Warm horizon rays</span>
-              </div>
-            </button>
-
-            <button type="button" class="style-card" data-style="nebula">
-              <div class="style-preview nebula-theme"></div>
-              <div class="style-info">
-                <span class="title">Quantum Nebula</span>
-                <span class="desc">Volumetric cosmic dust</span>
-              </div>
-            </button>
-
-            <button type="button" class="style-card" data-style="cyber">
-              <div class="style-preview cyber-theme"></div>
-              <div class="style-info">
-                <span class="title">Horizon Wave</span>
-                <span class="desc">Ultra-fine perspective</span>
-              </div>
-            </button>
-          </div>
           <select id="styleSelect" class="sr-only" aria-label="Visual Style Select">
             <option value="silk">Silk Flow</option>
+            <option value="solar">Solar Flare</option>
+            <option value="aurora">Cosmic Aurora</option>
+            <option value="cyber">Cyber Wave</option>
+            <option value="chrome">Liquid Chrome</option>
             <option value="obsidian">Obsidian</option>
             <option value="prism">Prism Glass</option>
-            <option value="editorial">Editorial</option>
-            <option value="aurora">Cosmic Aurora</option>
-            <option value="solar">Solar Glow</option>
-            <option value="nebula">Quantum Nebula</option>
-            <option value="cyber">Horizon Wave</option>
+            <option value="warp">Warp Speed</option>
           </select>
         </div>
 
-        <!-- BADGE / TAG INPUT (OPTIONAL PILL OVERLAY) -->
-        <div class="form-group">
-          <label for="badgeInput" class="group-label">Category Badge (Optional)</label>
-          <div class="input-wrapper">
-            <input type="text" id="badgeInput" maxlength="28" value="FEATURE LAUNCH" placeholder="e.g. VERSION 2.0, KEYNOTE..." />
+        <!-- COPY & HEADLINES -->
+        <div class="flex flex-col gap-3">
+          <!-- Category Badge Pill -->
+          <div>
+            <label class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between mb-1.5">
+              <span>Category Badge Pill (Optional)</span>
+              <span class="text-[10px] text-slate-500 lowercase">e.g. KEYNOTE, V2.0</span>
+            </label>
+            <input type="text" id="badgeInput" maxlength="30" value="FEATURE LAUNCH" placeholder="e.g. NEW RELEASE, PROMOTION..." class="w-full bg-dark-950/80 border border-dark-700/80 rounded-xl px-3.5 py-2 text-xs font-bold tracking-wider text-brand-300 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500/50 transition placeholder:text-slate-600" />
           </div>
-        </div>
 
-        <!-- TEXT CONTENT -->
-        <div class="form-group">
-          <label for="titleInput" class="group-label">Main Headline</label>
-          <div class="input-wrapper">
-            <input type="text" id="titleInput" maxlength="42" value="DESIGN THE FUTURE" placeholder="Enter headline..." />
+          <!-- Main Title -->
+          <div>
+            <label class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1.5">Main Title / Headline</label>
+            <input type="text" id="titleInput" maxlength="42" value="DESIGN THE FUTURE" placeholder="Enter headline..." class="w-full bg-dark-950/80 border border-dark-700/80 rounded-xl px-3.5 py-2 text-xs font-bold text-white focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500/50 transition placeholder:text-slate-600" />
           </div>
-        </div>
 
-        <div class="form-group">
-          <label for="subtitleInput" class="group-label">Supporting Text</label>
-          <div class="input-wrapper">
-            <input type="text" id="subtitleInput" maxlength="70" value="High-fidelity procedural motion graphics in real-time" placeholder="Enter subtitle..." />
+          <!-- Subtitle -->
+          <div>
+            <label class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1.5">Subtitle / Tagline</label>
+            <input type="text" id="subtitleInput" maxlength="70" value="High-fidelity procedural motion graphics in real-time" placeholder="Enter subtitle..." class="w-full bg-dark-950/80 border border-dark-700/80 rounded-xl px-3.5 py-2 text-xs font-medium text-slate-300 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500/50 transition placeholder:text-slate-600" />
           </div>
         </div>
 
         <!-- TYPOGRAPHY FONT & MOTION CONTROLS -->
-        <div class="form-row-2">
-          <div class="form-group">
-            <label class="group-label">Font Family</label>
-            <select id="fontSelect" class="styled-select">
-              <option value="Plus Jakarta Sans" selected>Plus Jakarta Sans (Clean)</option>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1.5">Font Styling</label>
+            <select id="fontSelect" class="w-full bg-dark-950/80 border border-dark-700/80 rounded-xl px-3 py-2 text-xs font-semibold text-white focus:border-brand-500 focus:outline-none transition">
+              <option value="Plus Jakarta Sans" selected>Plus Jakarta Sans (Modern)</option>
               <option value="Space Grotesk">Space Grotesk (Tech)</option>
               <option value="Outfit">Outfit (Bold Studio)</option>
+              <option value="Syne">Syne (Creative Display)</option>
               <option value="Cinzel">Cinzel (Editorial Serif)</option>
-              <option value="Inter">Inter (Minimal)</option>
+              <option value="JetBrains Mono">JetBrains Mono (Code)</option>
             </select>
           </div>
 
-          <div class="form-group">
-            <label class="group-label">Motion Kinetic Easing</label>
-            <select id="motionSelect" class="styled-select">
+          <div>
+            <label class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1.5">Motion Entrance</label>
+            <select id="motionSelect" class="w-full bg-dark-950/80 border border-dark-700/80 rounded-xl px-3 py-2 text-xs font-semibold text-white focus:border-brand-500 focus:outline-none transition">
               <option value="fade-rise" selected>Smooth Rise & Fade</option>
               <option value="scale-pop">Punchy Scale Pop</option>
               <option value="kinetic-drift">Kinetic Drift Zoom</option>
+              <option value="glitch-flash">Digital Flash Punch</option>
             </select>
           </div>
         </div>
 
         <!-- ASPECT RATIO & DURATION -->
-        <div class="form-row-2">
-          <div class="form-group">
-            <label class="group-label">Aspect Ratio</label>
-            <div class="segmented-control" id="aspectControl">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1.5">Aspect Ratio</label>
+            <div class="grid grid-cols-3 bg-dark-950/80 p-1 rounded-xl border border-dark-700/80" id="aspectControl">
               <button type="button" class="seg-btn active" data-aspect="16:9">16:9</button>
               <button type="button" class="seg-btn" data-aspect="9:16">9:16</button>
               <button type="button" class="seg-btn" data-aspect="1:1">1:1</button>
@@ -210,9 +284,9 @@
             </select>
           </div>
 
-          <div class="form-group">
-            <label class="group-label">Duration</label>
-            <div class="segmented-control" id="durationControl">
+          <div>
+            <label class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1.5">Duration</label>
+            <div class="grid grid-cols-4 bg-dark-950/80 p-1 rounded-xl border border-dark-700/80" id="durationControl">
               <button type="button" class="seg-btn" data-duration="4">4s</button>
               <button type="button" class="seg-btn active" data-duration="5">5s</button>
               <button type="button" class="seg-btn" data-duration="8">8s</button>
@@ -228,104 +302,107 @@
         </div>
 
         <!-- COLOR PALETTE MOOD -->
-        <div class="form-group">
-          <label class="group-label">Color Mood</label>
-          <div class="palette-container">
-            <div class="color-chips" id="colorChips">
+        <div>
+          <label class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1.5">Accent Lighting Color</label>
+          <div class="flex items-center justify-between bg-dark-950/80 p-2 rounded-xl border border-dark-700/80">
+            <div class="flex items-center gap-1.5" id="colorChips">
               <button type="button" class="chip active" data-color="#6366f1" style="--chip:#6366f1" title="Electric Indigo"></button>
               <button type="button" class="chip" data-color="#06b6d4" style="--chip:#06b6d4" title="Ocean Cyan"></button>
+              <button type="button" class="chip" data-color="#f59e0b" style="--chip:#f59e0b" title="Solar Gold"></button>
               <button type="button" class="chip" data-color="#f43f5e" style="--chip:#f43f5e" title="Sunset Coral"></button>
               <button type="button" class="chip" data-color="#10b981" style="--chip:#10b981" title="Emerald Glow"></button>
-              <button type="button" class="chip" data-color="#f59e0b" style="--chip:#f59e0b" title="Amber Gold"></button>
-              <button type="button" class="chip" data-color="#8b5cf6" style="--chip:#8b5cf6" title="Violet Dream"></button>
-              <button type="button" class="chip" data-color="#ec4899" style="--chip:#ec4899" title="Rose Quartz"></button>
+              <button type="button" class="chip" data-color="#a855f7" style="--chip:#a855f7" title="Neon Violet"></button>
+              <button type="button" class="chip" data-color="#ffffff" style="--chip:#ffffff" title="Pure Frost"></button>
             </div>
-            <div class="custom-color-field" title="Pick any custom hex color">
-              <input type="color" id="customColorPicker" value="#6366f1" />
+            <div class="flex items-center gap-1.5 text-xs font-bold text-slate-400 cursor-pointer pr-1">
+              <input type="color" id="customColorPicker" value="#6366f1" class="w-5 h-5 rounded-full cursor-pointer bg-transparent border-none appearance-none" />
               <span>Custom</span>
             </div>
           </div>
         </div>
 
         <!-- LOGO WATERMARK -->
-        <div class="form-group">
-          <label class="group-label">Brand Logo (Optional)</label>
-          <div class="file-upload-card">
-            <label for="logoUpload" class="file-upload-trigger">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-              <span id="logoFileName">Upload PNG or SVG logo</span>
+        <div>
+          <label class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1.5">Brand Logo Overlay (Optional)</label>
+          <div class="flex items-center gap-2">
+            <label for="logoUpload" class="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-dark-950/80 border border-dashed border-dark-700 hover:border-brand-500/70 text-slate-400 hover:text-white text-xs font-semibold cursor-pointer transition">
+              <i data-lucide="upload-cloud" class="w-4 h-4 text-brand-400"></i>
+              <span id="logoFileName">Upload PNG or SVG Logo</span>
             </label>
             <input type="file" id="logoUpload" accept="image/png,image/svg+xml,image/webp,image/jpeg" class="sr-only" />
-            <button type="button" id="removeLogoBtn" class="btn-clear-file" title="Remove logo" style="display:none;">✕</button>
+            <button type="button" id="removeLogoBtn" class="w-9 h-9 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 hover:bg-rose-500/20 grid place-items-center text-xs font-bold transition" style="display:none;" title="Remove Logo">✕</button>
           </div>
         </div>
 
-        <!-- AUDIO SOUNDSCAPE OPTIONS -->
-        <div class="form-group">
-          <label class="group-label">Generative Audio Soundtrack</label>
-          <div class="audio-control-row">
-            <select id="audioSoundSelect" class="styled-select audio-select">
+        <!-- GENERATIVE AUDIO -->
+        <div>
+          <label class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1.5">Generative Web Audio Track</label>
+          <div class="flex items-center gap-2">
+            <select id="audioSoundSelect" class="flex-1 bg-dark-950/80 border border-dark-700/80 rounded-xl px-3 py-2 text-xs font-semibold text-white focus:border-brand-500 focus:outline-none transition">
               <option value="ambient">Harmonic Ambient Pad (Warm C Maj9)</option>
+              <option value="solar">Solar Energy Pulse (Golden Frequency)</option>
               <option value="cosmic">Cosmic Space Resonance (Deep Filter)</option>
-              <option value="lofi">Subtle Lo-Fi Drone (Mellow)</option>
+              <option value="lofi">Lo-Fi Tape Drone (Mellow Warmth)</option>
             </select>
-            <button type="button" id="audioToggle" class="audio-switch-btn active" title="Toggle sound mute/unmute">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+            <button type="button" id="audioToggle" class="px-3 py-2 rounded-xl bg-brand-500/15 border border-brand-500/40 text-brand-300 hover:bg-brand-500/25 flex items-center gap-1.5 text-xs font-bold transition" title="Toggle sound mute/unmute">
+              <i data-lucide="volume-2" class="w-4 h-4"></i>
               <span id="audioStatusText">ON</span>
             </button>
           </div>
         </div>
       </aside>
 
-      <!-- RIGHT PREVIEW & STAGE -->
-      <section class="preview-panel">
-        <!-- PREVIEW HEADER -->
-        <div class="stage-header">
-          <div class="stage-info">
-            <span class="stage-title">Live Viewport</span>
-            <span class="stage-sep">•</span>
-            <span id="resolutionBadge" class="stage-res">1920 × 1080 (16:9)</span>
+      <!-- RIGHT PREVIEW VIEWPORT (7 COLS) -->
+      <section class="lg:col-span-7 bg-dark-900/90 backdrop-blur-xl border border-dark-700/60 rounded-3xl p-5 sm:p-6 shadow-2xl flex flex-col gap-4">
+        
+        <!-- STAGE HEADER -->
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-extrabold text-white font-outfit">Live Canvas Stage</span>
+            <span class="text-slate-500">•</span>
+            <span id="resolutionBadge" class="text-xs font-mono font-bold text-slate-400">1920 × 1080 (16:9)</span>
           </div>
-          <div class="playback-controls">
-            <span id="timeLabel" class="time-counter">00:00 / 00:05</span>
-            <button id="playBtn" class="btn-control" title="Toggle Play / Pause">
-              <svg id="playIcon" width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+          
+          <div class="flex items-center gap-2">
+            <span id="timeLabel" class="text-xs font-mono font-bold text-brand-400 bg-brand-500/10 border border-brand-500/20 px-2.5 py-1 rounded-lg">00:00 / 00:05</span>
+            <button id="playBtn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-dark-800 border border-dark-700 text-xs font-bold text-white hover:bg-dark-700 transition">
+              <i data-lucide="pause" class="w-3.5 h-3.5" id="playIcon"></i>
               <span id="playBtnText">Pause</span>
             </button>
-            <button id="restartBtn" class="btn-control icon-only" title="Replay animation">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            <button id="restartBtn" class="p-1.5 rounded-lg bg-dark-800 border border-dark-700 text-slate-300 hover:text-white hover:bg-dark-700 transition" title="Restart">
+              <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
             </button>
           </div>
         </div>
 
-        <!-- CANVAS STAGE -->
-        <div class="canvas-viewport" id="stageContainer">
-          <div class="canvas-wrapper" id="stageWrap">
-            <canvas id="renderCanvas"></canvas>
+        <!-- CANVAS CONTAINER (PERFECTLY CONTAINED) -->
+        <div class="w-full h-[520px] max-h-[calc(100vh-270px)] min-h-[380px] bg-dark-950 rounded-2xl border border-dark-700/80 p-3 sm:p-5 flex items-center justify-center overflow-hidden relative shadow-inner" id="stageContainer">
+          <div class="w-full h-full flex items-center justify-center" id="stageWrap">
+            <canvas id="renderCanvas" class="max-w-full max-h-full object-contain rounded-xl shadow-2xl shadow-black/80 border border-white/10"></canvas>
           </div>
         </div>
 
         <!-- TIMELINE SCRUBBER -->
-        <div class="timeline-container">
-          <div class="timeline-bar-wrap" id="timelineWrap">
-            <div class="timeline-rail">
-              <div class="timeline-fill" id="progressBar"></div>
-              <div class="timeline-thumb" id="progressHandle"></div>
-            </div>
+        <div class="py-1 cursor-pointer select-none" id="timelineWrap">
+          <div class="h-2 bg-dark-800 rounded-full relative overflow-visible">
+            <div class="h-full bg-gradient-to-r from-brand-500 via-indigo-400 to-cyan-400 rounded-full shadow-glow-indigo transition-all duration-75" id="progressBar" style="width: 0%;"></div>
+            <div class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-4 h-4 bg-white rounded-full shadow-lg shadow-brand-500/50 pointer-events-none opacity-0 hover:opacity-100 transition" id="progressHandle" style="left: 0%;"></div>
           </div>
         </div>
 
-        <!-- FOOTER BAR -->
-        <div class="stage-footer">
-          <div class="footer-meta">
-            <span class="tag-pill">60 FPS Hardware Render</span>
-            <span class="tag-pill">Private & Client-Side</span>
+        <!-- FOOTER STATUS -->
+        <div class="flex items-center justify-between text-xs pt-1 border-t border-dark-700/50">
+          <div class="flex items-center gap-3 text-slate-400 font-medium">
+            <span class="flex items-center gap-1"><i data-lucide="cpu" class="w-3.5 h-3.5 text-brand-400"></i> 60 FPS WebGL 2.0</span>
+            <span>•</span>
+            <span class="flex items-center gap-1"><i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-400"></i> Zero Cloud Server</span>
           </div>
-          <div class="footer-status">
-            <span id="renderStatus" class="status-msg">Ready to render</span>
+          <div class="font-bold text-emerald-400 flex items-center gap-1.5" id="renderStatus">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Ready to render
           </div>
         </div>
       </section>
+
     </main>
   </div>
 
