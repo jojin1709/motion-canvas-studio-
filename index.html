@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#090a0f" />
+  <meta name="description" content="FluxFrame — Create stunning studio-grade motion graphics and videos directly in your browser." />
+  <title>FluxFrame — Studio Motion Video Generator</title>
+  
+  <!-- Premium Modern Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-layout">
+    <!-- TOP NAVIGATION -->
+    <header class="navbar">
+      <div class="brand">
+        <div class="logo-mark">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+            <polyline points="2 17 12 22 22 17"></polyline>
+            <polyline points="2 12 12 17 22 12"></polyline>
+          </svg>
+        </div>
+        <div class="brand-meta">
+          <span class="brand-name">FluxFrame</span>
+          <span class="brand-badge">STUDIO</span>
+        </div>
+      </div>
+
+      <div class="navbar-center">
+        <div class="engine-status">
+          <span class="pulse-indicator"></span>
+          <span>In-Browser GPU Acceleration</span>
+        </div>
+      </div>
+
+      <div class="navbar-actions">
+        <button id="clearBtn" class="btn-ghost" title="Reset to default scene">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          <span>Reset</span>
+        </button>
+        <button id="exportBtn" class="btn-primary">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span id="exportBtnText">Export Video</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- MAIN STUDIO WORKSPACE -->
+    <main class="studio-container">
+      <!-- LEFT CONTROL PANEL -->
+      <aside class="sidebar-panel">
+        <div class="panel-section-title">
+          <h2>Scene Settings</h2>
+          <p>Customize visuals, copy, and motion styling</p>
+        </div>
+
+        <!-- STYLE PRESETS -->
+        <div class="form-group">
+          <label class="group-label">Visual Style</label>
+          <div class="style-grid" id="styleGrid">
+            <button type="button" class="style-card active" data-style="silk">
+              <div class="style-preview silk-theme"></div>
+              <div class="style-info">
+                <span class="title">Silk Flow</span>
+                <span class="desc">Fluid gradient mesh</span>
+              </div>
+            </button>
+
+            <button type="button" class="style-card" data-style="obsidian">
+              <div class="style-preview obsidian-theme"></div>
+              <div class="style-info">
+                <span class="title">Obsidian</span>
+                <span class="desc">Deep studio cinematic</span>
+              </div>
+            </button>
+
+            <button type="button" class="style-card" data-style="prism">
+              <div class="style-preview prism-theme"></div>
+              <div class="style-info">
+                <span class="title">Prism Glass</span>
+                <span class="desc">Iridescent glow</span>
+              </div>
+            </button>
+
+            <button type="button" class="style-card" data-style="editorial">
+              <div class="style-preview editorial-theme"></div>
+              <div class="style-info">
+                <span class="title">Editorial</span>
+                <span class="desc">Modern minimal aura</span>
+              </div>
+            </button>
+          </div>
+          <select id="styleSelect" class="sr-only" aria-label="Visual Style Select">
+            <option value="silk">Silk Flow</option>
+            <option value="obsidian">Obsidian</option>
+            <option value="prism">Prism Glass</option>
+            <option value="editorial">Editorial</option>
+          </select>
+        </div>
+
+        <!-- TEXT CONTENT -->
+        <div class="form-group">
+          <label for="titleInput" class="group-label">Main Headline</label>
+          <div class="input-wrapper">
+            <input type="text" id="titleInput" maxlength="40" value="DESIGN THE FUTURE" placeholder="Enter headline..." />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="subtitleInput" class="group-label">Supporting Text</label>
+          <div class="input-wrapper">
+            <input type="text" id="subtitleInput" maxlength="65" value="High-fidelity motion graphics rendered in real-time" placeholder="Enter subtitle..." />
+          </div>
+        </div>
+
+        <!-- ASPECT RATIO & DURATION (SEGMENTED CONTROLS) -->
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="group-label">Aspect Ratio</label>
+            <div class="segmented-control" id="aspectControl">
+              <button type="button" class="seg-btn active" data-aspect="16:9">16:9</button>
+              <button type="button" class="seg-btn" data-aspect="9:16">9:16</button>
+              <button type="button" class="seg-btn" data-aspect="1:1">1:1</button>
+            </div>
+            <select id="aspectSelect" class="sr-only" aria-label="Aspect Select">
+              <option value="16:9" selected>16:9</option>
+              <option value="9:16">9:16</option>
+              <option value="1:1">1:1</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="group-label">Duration</label>
+            <div class="segmented-control" id="durationControl">
+              <button type="button" class="seg-btn" data-duration="4">4s</button>
+              <button type="button" class="seg-btn active" data-duration="5">5s</button>
+              <button type="button" class="seg-btn" data-duration="8">8s</button>
+            </div>
+            <select id="durationSelect" class="sr-only" aria-label="Duration Select">
+              <option value="4">4s</option>
+              <option value="5" selected>5s</option>
+              <option value="8">8s</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- COLOR PALETTE -->
+        <div class="form-group">
+          <label class="group-label">Color Mood</label>
+          <div class="palette-container">
+            <div class="color-chips" id="colorChips">
+              <button type="button" class="chip active" data-color="#6366f1" style="--chip:#6366f1" title="Electric Indigo"></button>
+              <button type="button" class="chip" data-color="#06b6d4" style="--chip:#06b6d4" title="Ocean Cyan"></button>
+              <button type="button" class="chip" data-color="#f43f5e" style="--chip:#f43f5e" title="Sunset Coral"></button>
+              <button type="button" class="chip" data-color="#10b981" style="--chip:#10b981" title="Emerald Glow"></button>
+              <button type="button" class="chip" data-color="#f59e0b" style="--chip:#f59e0b" title="Amber Gold"></button>
+            </div>
+            <div class="custom-color-field" title="Custom color picker">
+              <input type="color" id="customColorPicker" value="#6366f1" />
+              <span>Custom</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- LOGO WATERMARK -->
+        <div class="form-group">
+          <label class="group-label">Brand Logo (Optional)</label>
+          <div class="file-upload-card">
+            <label for="logoUpload" class="file-upload-trigger">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <span id="logoFileName">Upload PNG or SVG logo</span>
+            </label>
+            <input type="file" id="logoUpload" accept="image/png,image/svg+xml,image/webp,image/jpeg" class="sr-only" />
+            <button type="button" id="removeLogoBtn" class="btn-clear-file" title="Remove logo" style="display:none;">✕</button>
+          </div>
+        </div>
+
+        <!-- SOUNDTRACK TOGGLE -->
+        <div class="form-group">
+          <label class="group-label">Audio</label>
+          <button type="button" id="audioToggle" class="audio-switch-card active">
+            <div class="switch-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+            </div>
+            <div class="switch-content">
+              <span class="switch-title">Harmonic Ambient Pad</span>
+              <span class="switch-sub">Generative background sound</span>
+            </div>
+            <span class="switch-badge">ON</span>
+          </button>
+        </div>
+      </aside>
+
+      <!-- RIGHT PREVIEW & STAGE -->
+      <section class="preview-panel">
+        <!-- PREVIEW HEADER -->
+        <div class="stage-header">
+          <div class="stage-info">
+            <span class="stage-title">Live Viewport</span>
+            <span class="stage-sep">•</span>
+            <span id="resolutionBadge" class="stage-res">1920 × 1080 (16:9)</span>
+          </div>
+          <div class="playback-controls">
+            <span id="timeLabel" class="time-counter">00:00 / 00:05</span>
+            <button id="playBtn" class="btn-control" title="Toggle Play / Pause">
+              <svg id="playIcon" width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+              <span id="playBtnText">Pause</span>
+            </button>
+            <button id="restartBtn" class="btn-control icon-only" title="Replay animation">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- CANVAS STAGE -->
+        <div class="canvas-viewport" id="stageContainer">
+          <div class="canvas-wrapper" id="stageWrap">
+            <canvas id="renderCanvas"></canvas>
+          </div>
+        </div>
+
+        <!-- TIMELINE SCRUBBER -->
+        <div class="timeline-container">
+          <div class="timeline-bar-wrap" id="timelineWrap">
+            <div class="timeline-rail">
+              <div class="timeline-fill" id="progressBar"></div>
+              <div class="timeline-thumb" id="progressHandle"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FOOTER BAR -->
+        <div class="stage-footer">
+          <div class="footer-meta">
+            <span class="tag-pill">60 FPS Hardware Render</span>
+            <span class="tag-pill">Private & Client-Side</span>
+          </div>
+          <div class="footer-status">
+            <span id="renderStatus" class="status-msg">Ready to render</span>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
