@@ -73,6 +73,15 @@ const saveAiConfigBtn = document.getElementById('saveAiConfigBtn');
 const cfAccountIdInput = document.getElementById('cfAccountIdInput');
 const cfApiTokenInput = document.getElementById('cfApiTokenInput');
 
+// Background Texture / Video Layer Elements
+const bgMediaUpload = document.getElementById('bgMediaUpload');
+const bgMediaFileName = document.getElementById('bgMediaFileName');
+const bgTexturePresetSelect = document.getElementById('bgTexturePresetSelect');
+const bgBlendModeSelect = document.getElementById('bgBlendModeSelect');
+const bgOpacitySlider = document.getElementById('bgOpacitySlider');
+const bgOpacityLabel = document.getElementById('bgOpacityLabel');
+const removeBgMediaBtn = document.getElementById('removeBgMediaBtn');
+
 // Multi-Scene Storyboard Sequence State
 let scenes = [
   {
@@ -87,7 +96,10 @@ let scenes = [
     glow: 26,
     particle: 'none',
     cta: 'none',
-    duration: 5
+    duration: 5,
+    bgPreset: 'none',
+    bgBlend: 'screen',
+    bgOpacity: 0.70
   }
 ];
 let activeSceneIdx = 0;
@@ -113,6 +125,15 @@ let userLogo = null;
 let customAudioElement = null;
 let audioEnabled = true;
 let audioCtx = null;
+
+// Multi-Layer Background Texture State
+let bgImageElement = null;
+let bgVideoElement = null;
+let bgMediaIsVideo = false;
+let bgBlendMode = 'screen';
+let bgOpacity = 0.70;
+let bgTexturePreset = 'none';
+const proceduralTextures = {};
 
 // Procedural Particle System Pool
 let particles = [];
@@ -750,6 +771,105 @@ function speakSceneVoiceover(text, gender) {
 }
 
 // ==========================================
+// PROCEDURAL BACKGROUND TEXTURES & COMPOSITOR
+// ==========================================
+function getProceduralTexture(type, w, h) {
+  if (!type || type === 'none') return null;
+  const key = `${type}_${w}_${h}`;
+  if (proceduralTextures[key]) return proceduralTextures[key];
+
+  const tCanvas = document.createElement('canvas');
+  tCanvas.width = w;
+  tCanvas.height = h;
+  const tCtx = tCanvas.getContext('2d');
+
+  if (type === 'smoke') {
+    const grad = tCtx.createRadialGradient(w * 0.5, h * 0.5, 40, w * 0.5, h * 0.5, Math.max(w, h) * 0.65);
+    grad.addColorStop(0, 'rgba(255, 255, 255, 0.45)');
+    grad.addColorStop(0.5, 'rgba(180, 210, 240, 0.22)');
+    grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    tCtx.fillStyle = grad;
+    tCtx.fillRect(0, 0, w, h);
+
+    for (let i = 0; i < 35; i++) {
+      const px = Math.random() * w;
+      const py = Math.random() * h;
+      const pr = 80 + Math.random() * 200;
+      const pGrad = tCtx.createRadialGradient(px, py, 10, px, py, pr);
+      pGrad.addColorStop(0, 'rgba(240, 248, 255, 0.22)');
+      pGrad.addColorStop(1, 'rgba(0,0,0,0)');
+      tCtx.fillStyle = pGrad;
+      tCtx.beginPath();
+      tCtx.arc(px, py, pr, 0, Math.PI * 2);
+      tCtx.fill();
+    }
+  } else if (type === 'cybergrid') {
+    tCtx.strokeStyle = 'rgba(255, 255, 255, 0.28)';
+    tCtx.lineWidth = 1.6;
+    const cols = 28;
+    const stepX = w / cols;
+    for (let x = 0; x <= w; x += stepX) {
+      tCtx.beginPath();
+      tCtx.moveTo(x, 0);
+      tCtx.lineTo(x, h);
+      tCtx.stroke();
+    }
+    const rows = 18;
+    const stepY = h / rows;
+    for (let y = 0; y <= h; y += stepY) {
+      tCtx.beginPath();
+      tCtx.moveTo(0, y);
+      tCtx.lineTo(w, y);
+      tCtx.stroke();
+    }
+  } else if (type === 'lightleaks') {
+    const leak1 = tCtx.createRadialGradient(w * 0.12, h * 0.15, 20, w * 0.12, h * 0.15, w * 0.65);
+    leak1.addColorStop(0, 'rgba(251, 146, 60, 0.65)');
+    leak1.addColorStop(0.5, 'rgba(236, 72, 153, 0.3)');
+    leak1.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    tCtx.fillStyle = leak1;
+    tCtx.fillRect(0, 0, w, h);
+
+    const leak2 = tCtx.createRadialGradient(w * 0.88, h * 0.85, 20, w * 0.88, h * 0.85, w * 0.6);
+    leak2.addColorStop(0, 'rgba(56, 189, 248, 0.55)');
+    leak2.addColorStop(0.5, 'rgba(168, 85, 247, 0.25)');
+    leak2.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    tCtx.fillStyle = leak2;
+    tCtx.fillRect(0, 0, w, h);
+  } else if (type === 'bokeh') {
+    for (let i = 0; i < 45; i++) {
+      const bx = Math.random() * w;
+      const by = Math.random() * h;
+      const br = 25 + Math.random() * 70;
+      const bGrad = tCtx.createRadialGradient(bx, by, br * 0.2, bx, by, br);
+      bGrad.addColorStop(0, 'rgba(254, 240, 138, 0.45)');
+      bGrad.addColorStop(0.8, 'rgba(251, 191, 36, 0.18)');
+      bGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      tCtx.fillStyle = bGrad;
+      tCtx.beginPath();
+      tCtx.arc(bx, by, br, 0, Math.PI * 2);
+      tCtx.fill();
+    }
+  }
+
+  proceduralTextures[key] = tCanvas;
+  return tCanvas;
+}
+
+function drawCoverMedia(ctx, media, w, h) {
+  const mw = media.videoWidth || media.naturalWidth || media.width;
+  const mh = media.videoHeight || media.naturalHeight || media.height;
+  if (!mw || !mh) return;
+
+  const scale = Math.max(w / mw, h / mh);
+  const dw = mw * scale;
+  const dh = mh * scale;
+  const dx = (w - dw) / 2;
+  const dy = (h - dh) / 2;
+  ctx.drawImage(media, dx, dy, dw, dh);
+}
+
+// ==========================================
 // 2D CANVAS COMPOSITOR & KINETIC TYPOGRAPHY
 // ==========================================
 function render(time) {
@@ -789,6 +909,9 @@ function render(time) {
   const currentGlow = currentScene.glow !== undefined ? currentScene.glow : textGlow;
   const currentParticle = currentScene.particle || particleType;
   const currentCTA = currentScene.cta || ctaBadge;
+  const curBgPreset = currentScene.bgPreset || bgTexturePresetSelect.value || 'none';
+  const curBgBlend = currentScene.bgBlend || bgBlendModeSelect.value || 'screen';
+  const curBgOpacity = currentScene.bgOpacity !== undefined ? currentScene.bgOpacity : (Number(bgOpacitySlider.value) / 100);
 
   const progData = programs[currentStyle] || programs.silk;
 
@@ -809,6 +932,30 @@ function render(time) {
   const h = canvas.height;
   ctx.clearRect(0, 0, w, h);
   ctx.drawImage(glCanvas, 0, 0, w, h);
+
+  // 2b. Multi-Layer Background Texture / Video Overlay
+  if (bgImageElement && bgImageElement.complete) {
+    ctx.save();
+    ctx.globalCompositeOperation = curBgBlend;
+    ctx.globalAlpha = curBgOpacity;
+    drawCoverMedia(ctx, bgImageElement, w, h);
+    ctx.restore();
+  } else if (bgMediaIsVideo && bgVideoElement) {
+    ctx.save();
+    ctx.globalCompositeOperation = curBgBlend;
+    ctx.globalAlpha = curBgOpacity;
+    drawCoverMedia(ctx, bgVideoElement, w, h);
+    ctx.restore();
+  } else if (curBgPreset && curBgPreset !== 'none') {
+    const texCanvas = getProceduralTexture(curBgPreset, w, h);
+    if (texCanvas) {
+      ctx.save();
+      ctx.globalCompositeOperation = curBgBlend;
+      ctx.globalAlpha = curBgOpacity;
+      ctx.drawImage(texCanvas, 0, 0, w, h);
+      ctx.restore();
+    }
+  }
 
   const scale = Math.min(w, h) / 1000;
 
@@ -1068,6 +1215,12 @@ function loadSceneToForm(idx) {
   if (textGlowSelect) textGlowSelect.value = sc.glow !== undefined ? String(sc.glow) : '26';
   if (particleSelect) particleSelect.value = sc.particle || 'none';
   if (ctaSelect) ctaSelect.value = sc.cta || 'none';
+  if (bgTexturePresetSelect) bgTexturePresetSelect.value = sc.bgPreset || 'none';
+  if (bgBlendModeSelect) bgBlendModeSelect.value = sc.bgBlend || 'screen';
+  if (bgOpacitySlider) {
+    bgOpacitySlider.value = Math.round((sc.bgOpacity !== undefined ? sc.bgOpacity : 0.70) * 100);
+    if (bgOpacityLabel) bgOpacityLabel.textContent = `${bgOpacitySlider.value}%`;
+  }
   
   if (sc.accent) {
     accent = sc.accent;
@@ -1099,7 +1252,10 @@ function saveCurrentFormToScene() {
     glow: textGlowSelect ? Number(textGlowSelect.value) : 26,
     particle: particleSelect ? particleSelect.value : 'none',
     cta: ctaSelect ? ctaSelect.value : 'none',
-    duration: durationSelect ? Number(durationSelect.value) : 5
+    duration: durationSelect ? Number(durationSelect.value) : 5,
+    bgPreset: bgTexturePresetSelect ? bgTexturePresetSelect.value : 'none',
+    bgBlend: bgBlendModeSelect ? bgBlendModeSelect.value : 'screen',
+    bgOpacity: bgOpacitySlider ? (Number(bgOpacitySlider.value) / 100) : 0.70
   };
 }
 
@@ -1757,6 +1913,109 @@ if (particleSelect) {
 if (ctaSelect) {
   ctaSelect.addEventListener('change', () => {
     ctaBadge = ctaSelect.value;
+    saveCurrentFormToScene();
+    render(currentTime);
+  });
+}
+
+// Background Media Upload (Image or Video)
+if (bgMediaUpload) {
+  bgMediaUpload.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const isVid = file.type.startsWith('video/');
+    bgMediaIsVideo = isVid;
+    bgMediaFileName.textContent = file.name.length > 16 ? file.name.slice(0, 13) + '...' : file.name;
+    if (removeBgMediaBtn) removeBgMediaBtn.style.display = 'inline-block';
+    if (bgTexturePresetSelect) bgTexturePresetSelect.value = 'none';
+
+    if (isVid) {
+      bgImageElement = null;
+      const fileUrl = URL.createObjectURL(file);
+      bgVideoElement = document.createElement('video');
+      bgVideoElement.src = fileUrl;
+      bgVideoElement.loop = true;
+      bgVideoElement.muted = true;
+      bgVideoElement.playsInline = true;
+      bgVideoElement.play().catch(() => {});
+      showToast(`🎬 Loaded background video: ${file.name}`);
+    } else {
+      if (bgVideoElement) {
+        try { bgVideoElement.pause(); } catch(e){}
+        bgVideoElement = null;
+      }
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          bgImageElement = img;
+          render(currentTime);
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+      showToast(`🖼️ Loaded background image: ${file.name}`);
+    }
+    saveCurrentFormToScene();
+    render(currentTime);
+  });
+}
+
+if (removeBgMediaBtn) {
+  removeBgMediaBtn.addEventListener('click', () => {
+    bgImageElement = null;
+    if (bgVideoElement) {
+      try { bgVideoElement.pause(); } catch(e){}
+      bgVideoElement = null;
+    }
+    bgMediaIsVideo = false;
+    bgMediaUpload.value = '';
+    bgMediaFileName.textContent = 'Upload Image/Video';
+    removeBgMediaBtn.style.display = 'none';
+    if (bgTexturePresetSelect) bgTexturePresetSelect.value = 'none';
+    saveCurrentFormToScene();
+    render(currentTime);
+    showToast('Removed background layer');
+  });
+}
+
+// Background Texture Presets Dropdown
+if (bgTexturePresetSelect) {
+  bgTexturePresetSelect.addEventListener('change', (e) => {
+    bgTexturePreset = e.target.value;
+    if (bgTexturePreset !== 'none') {
+      bgImageElement = null;
+      if (bgVideoElement) {
+        try { bgVideoElement.pause(); } catch(e){}
+        bgVideoElement = null;
+      }
+      bgMediaIsVideo = false;
+      bgMediaUpload.value = '';
+      bgMediaFileName.textContent = 'Upload Image/Video';
+      if (removeBgMediaBtn) removeBgMediaBtn.style.display = 'inline-block';
+      showToast(`✨ Applied "${bgTexturePreset}" texture overlay!`);
+    } else {
+      if (removeBgMediaBtn) removeBgMediaBtn.style.display = 'none';
+    }
+    saveCurrentFormToScene();
+    render(currentTime);
+  });
+}
+
+// Background Blend Mode & Opacity
+if (bgBlendModeSelect) {
+  bgBlendModeSelect.addEventListener('change', () => {
+    bgBlendMode = bgBlendModeSelect.value;
+    saveCurrentFormToScene();
+    render(currentTime);
+  });
+}
+
+if (bgOpacitySlider) {
+  bgOpacitySlider.addEventListener('input', (e) => {
+    bgOpacity = Number(e.target.value) / 100;
+    if (bgOpacityLabel) bgOpacityLabel.textContent = `${e.target.value}%`;
     saveCurrentFormToScene();
     render(currentTime);
   });

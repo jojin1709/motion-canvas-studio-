@@ -1,185 +1,182 @@
-> [!NOTE]
-> **FluxFrame v1.0 is live:** High-definition in-browser procedural motion video rendering, WebGL GLSL multi-shader engine, generative Web Audio synthesis, and local client-side WebM export.
+# ❖ FluxFrame Studio Pro
+### Real-Time Procedural Motion Video Generator & AI Storyboard Engine
 
-<div align="center">
+An autonomous, GPU-accelerated motion graphics engine that runs entirely inside your browser. No server rendering queues, no cloud tracking, zero data retention, and no complex video editing timelines required.
 
-# ❖ FluxFrame Studio
-### Browser-Native Procedural Motion Video Generator
-
-An autonomous, GPU-accelerated video generator that runs entirely inside your browser. No server rendering, no cloud upload, and zero video editing timelines required.
-
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-flux--frame.vercel.app-10b981?style=for-the-badge&logo=vercel)](https://flux-frame.vercel.app/)
-[![Developed by JOJIN JOHN](https://img.shields.io/badge/Developer-JOJIN%20JOHN-6366f1?style=for-the-badge&logo=github)](https://github.com/jojin1709)
+[![Live Demo](https://img.shields.io/badge/Live%20Production-fluxframe--studio.pages.dev-6366f1?style=for-the-badge&logo=cloudflare)](https://fluxframe-studio.pages.dev/)
+[![Cloudflare Workers AI](https://img.shields.io/badge/AI%20Inference-Llama--3.2--3B-orange?style=for-the-badge&logo=cloudflare)](https://developers.cloudflare.com/workers-ai/)
+[![Developer: JOJIN JOHN](https://img.shields.io/badge/Developer-JOJIN%20JOHN-10b981?style=for-the-badge&logo=github)](https://github.com/jojin1709)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
-[![Zero Backend](https://img.shields.io/badge/Backend-100%25%20Client--Side-emerald?style=for-the-badge)](https://github.com/jojin1709/motion-canvas-studio-)
+[![Zero Server Storage](https://img.shields.io/badge/Privacy-100%25%20Client--Side-emerald?style=for-the-badge)](https://github.com/jojin1709/motion-canvas-studio-)
 
-<p><strong><a href="https://flux-frame.vercel.app/" target="_blank">🚀 Try Live Demo: flux-frame.vercel.app</a></strong></p>
+<p align="center">
+  <strong><a href="https://fluxframe-studio.pages.dev/" target="_blank">🚀 Launch Live Studio: https://fluxframe-studio.pages.dev</a></strong>
+</p>
 
 ```bash
-# Or run locally in 5 seconds
+# Run locally in seconds
+git clone https://github.com/jojin1709/motion-canvas-studio-.git
+cd motion-canvas-studio-
 npx serve .
 ```
 
-<sub>Open in Chrome, Edge, Brave, or Firefox. No compilation or dependencies needed.</sub>
+---
+
+## 🌟 Overview & Key Features
+
+FluxFrame Studio Pro shifts the entire video production pipeline directly into the client's browser using **hardware-accelerated WebGL fragment shaders**, **2D canvas kinetic typography compositing**, **Web Audio API harmonic synthesis**, and the **HTML5 MediaRecorder API**.
+
+### 🎬 Studio Pro Capabilities
+
+1. **Multi-Scene Storyboard Sequence Builder**:
+   - Create multi-chapter sequential video presentations with independent styles, typography, particles, and durations per scene.
+   - Real-time tab switching, adding (`+ Add Scene`), reordering, and deleting scenes.
+   - Unified timeline scrubber and sequential multi-scene video encoding.
+
+2. **8 Procedural GLSL Shaders**:
+   - **Silk Flow**: Luxury Apple fluid mesh with organic color diffusion.
+   - **Solar Flare**: Blazing fiery orange-gold rays, plasma core, and solar flares.
+   - **Cosmic Aurora**: Emerald & cyan northern lights ribbons with stardust.
+   - **Cyber Wave**: Vibrant synthwave 3D neon grid with retro sun horizon.
+   - **Liquid Chrome**: Reflective metallic mercury ripples with specular reflections.
+   - **Obsidian Darkroom**: Cinematic deep moody studio with bokeh spheres.
+   - **Prism Glass**: Holographic optical caustics with chromatic dispersion.
+   - **Warp Speed**: Relativistic hyperspace tunnel with radial velocity rays.
+
+3. **Cloudflare Workers AI Prompt-to-Scene Generator**:
+   - Natural language prompt parsing powered by `@cf/meta/llama-3.2-3b-instruct` on Cloudflare Workers AI edge.
+   - 100% private local fallback engine for offline prompt generation.
+
+4. **Multi-Layer Background Texture & Video Layer**:
+   - Upload custom background photos (`.png`, `.jpg`, `.webp`) or video loops (`.mp4`, `.webm`).
+   - 6 procedural shader blend modes (*Screen*, *Overlay*, *Normal*, *Multiply*, *Color Dodge*, *Soft Light*).
+   - Built-in procedural textures: Atmospheric Smoke, 3D Wireframe Grid, Prism Light Leaks, and Soft Gold Bokeh.
+   - Adjustable layer opacity and blur filters.
+
+5. **Gradient Headlines & Text Glow FX**:
+   - 6 curated typographic gradient fills: *Sunset Flame*, *Cyber Neon*, *Deep Aqua*, *Liquid Chrome*, *Prism Rainbow*, and *Solid Accent*.
+   - Configurable neon glow intensity (*12px Subtle*, *26px Vibrant*, *48px Hyper Beam*, *Clean*).
+
+6. **Procedural Atmospheric Particle Engine**:
+   - Physics-driven particle overlays running on top of WebGL shaders:
+     - 🌧️ *Falling Raindrops & Mist*
+     - ✨ *Floating Cosmic Dust*
+     - ⚡ *Cyber Glitch Sparks*
+     - 🌌 *Starfield Warp Speed*
+     - 🎉 *Celebration Confetti*
+
+7. **Animated Call-to-Action (CTA) Badges**:
+   - Pulsing high-contrast action pills: `📲 Download App`, `🔗 Link in Bio`, `🔥 Shop Now (50% OFF)`, `▶️ Subscribe & Follow`, `🚀 Register Free`, and `👆 Swipe Up`.
+
+8. **AI Speech Synthesis Voiceover (TTS)**:
+   - Automated real-time narration of scene headlines during playback and sequence export with selectable *Cinematic* and *Studio* voices.
+
+9. **One-Click Studio Templates Library**:
+   - Pre-configured presets for popular social formats:
+     - 📱 *TikTok / Reels Hook (9:16)*
+     - 🎬 *YouTube Cinematic Intro (16:9)*
+     - 🎵 *Spotify Canvas Loop (9:16)*
+     - 🚀 *Tech Product Launch (16:9)*
+     - 🌧️ *Midnight Rain Lo-Fi (16:9)*
+     - 🔥 *Solar Keynote Summit (16:9)*
+     - ⚡ *Cyberpunk Synthwave (16:9)*
+     - 💎 *Luxury Brand Editorial (1:1)*
+     - 🎙️ *Dark Podcast Clip (1:1)*
+
+10. **Multi-Format Video & Animated GIF Export**:
+    - Direct client-side video encoding in **WebM (VP9/Opus)**, **MP4**, and **Animated GIF** formats.
+
+11. **Cloudflare Turnstile Bot Verification**:
+    - Integrated security check for bot protection with 0% user data collection.
 
 ---
 
-</div>
-
-> [!TIP]
-> **Production Ready:** FluxFrame is 100% static. You can deploy it to **Vercel**, **Cloudflare Pages**, or **GitHub Pages** instantly without provisioning backend compute or databases.
-
----
-
-## Table of Contents
-
-- [What is FluxFrame?](#what-is-fluxframe)
-  - [Why FluxFrame Exists](#why-fluxframe-exists)
-  - [Zero Server Video Generation](#zero-server-video-generation)
-- [Key Capabilities](#key-capabilities)
-- [Visual Style Systems](#visual-style-systems)
-- [Architecture](#architecture)
-- [Quick Start](#quick-start)
-  - [Prerequisites](#prerequisites)
-  - [Running Locally](#running-locally)
-- [Deploy to Vercel](#deploy-to-vercel)
-- [Common Questions](#common-questions)
-- [Developer](#developer)
-- [License](#license)
-
----
-
-## What is FluxFrame?
-
-FluxFrame is an open-source, client-side motion graphics studio designed to turn text, visual styles, and assets into cinematic videos with zero video editing experience.
-
-Unlike conventional video editors (Premiere, After Effects, CapCut), FluxFrame is an **autonomous procedural motion generator**. You pick a visual system, configure your copy, customize duration/aspect ratio, and let your local GPU render and export high-bitrate WebM video directly to your downloads folder.
-
-<a id="why-fluxframe-exists"></a>
-<details>
-<summary><strong>Why FluxFrame Exists</strong></summary>
-
-Rendering video traditionally requires heavyweight video editing software or expensive cloud rendering APIs (FFmpeg workers, AWS Lambda clusters). 
-
-FluxFrame shifts the entire render pipeline directly into the client's web browser using **WebGL fragment shaders** and the **HTML5 MediaRecorder API**, eliminating cloud rendering costs and latency completely.
-
-</details>
-
-<a id="zero-server-video-generation"></a>
-<details>
-<summary><strong>Zero Server Video Generation & Privacy</strong></summary>
-
-Because rendering happens locally via your GPU:
-- **No data is uploaded**: Your titles, subtitles, uploaded logos, and generated videos never touch a remote server.
-- **Instant previewing**: Real-time 60 FPS viewport with live timeline scrubbing.
-- **No subscription or API keys**: Runs offline without external service dependencies.
-
-</details>
-
----
-
-## Key Capabilities
-
-- **Multi-Shader GPU Engine**: 4 distinct procedural shaders programmed directly in hardware-accelerated GLSL.
-- **2D Layer Compositor**: Kinetic typography, optical drop shadows, studio lighting, vignettes, and logo overlays.
-- **Generative Web Audio Synthesis**: Procedural harmonic ambient pads synthesized with Web Audio API and embedded directly into the video stream.
-- **Multi-Format Export**: One-click switching between `16:9` (Landscape), `9:16` (Story / Reels / TikTok), and `1:1` (Square).
-- **Logo & Watermark Embedding**: Upload any PNG or SVG to composite into the title sequence.
-- **Interactive Timeline Scrubber**: Drag and scrub to any second of the scene.
-- **High-Bitrate Video Recording**: Direct VP9/VP8 container encoding via `canvas.captureStream()`.
-
----
-
-## Visual Style Systems
-
-| Style | Aesthetic | Shader Characteristics |
-| :--- | :--- | :--- |
-| **Silk Flow** | Luxury Apple/Stripe-inspired | Fluid organic gradient mesh with dynamic light refraction and center ambient glow |
-| **Obsidian** | Darkroom Cinematic Studio | Deep moody backdrop with moving bokeh spheres and soft atmospheric lighting |
-| **Prism Glass** | Iridescent Modernism | Refractive caustic sweep with subtle spectral chromatic dispersion |
-| **Editorial** | Clean Architectural Minimal | Sleek dual-tone vertical gradient with precision light beam sweep |
-
----
-
-## Architecture
-
-FluxFrame combines hardware WebGL fragment shading with a 2D composite layer and audio destination stream:
+## 🏗️ Architecture
 
 ```mermaid
 flowchart TD
-    GL["WebGL GLSL Shaders<br/>(Offscreen GPU Canvas)"] --> COMP["2D Layer Compositor<br/>(Typography, Logos, Vignettes)"]
-    AUDIO["Web Audio Oscillator Engine<br/>(Harmonic Synth Pads)"] --> MIX["MediaStream Destination"]
-    
-    COMP --> VIEW["Live Interactive Viewport<br/>(60 FPS Display)"]
-    COMP --> STREAM["Canvas Video Stream"]
-    
-    STREAM --> REC["MediaRecorder API<br/>(VP9 / VP8 12Mbps)"]
-    MIX --> REC
-    
-    REC --> DOWNLOAD["Direct WebM File Export<br/>(Zero Cloud Render)"]
+    subgraph Client ["Client Browser Runtime (100% Local & Private)"]
+        UI["Studio Pro Control Panel<br/>(Storyboard, Typography, Particles, Audio, Colors)"]
+        AI["Cloudflare Workers AI Edge<br/>(@cf/meta/llama-3.2-3b-instruct)"] --> UI
+        
+        UI --> GL["WebGL GLSL Shader Pipeline<br/>(8 Hardware Shaders)"]
+        UI --> BG["Background Media & Texture Layer<br/>(Image/Video with Screen/Overlay Blend)"]
+        UI --> PART["Particle Physics Engine<br/>(Rain, Sparks, Dust, Stars, Confetti)"]
+        
+        GL --> COMP["2D Canvas Compositor Layer"]
+        BG --> COMP
+        PART --> COMP
+        
+        UI --> KINETIC["Kinetic Typography & CTA Badges<br/>(Glow FX, Gradients, Fonts)"]
+        KINETIC --> COMP
+        
+        AUDIO["Web Audio Synthesizer & Custom Tracks<br/>(Oscillators, Biquad Filters, Pad Synths)"] --> REC["MediaRecorder & Stream Mix"]
+        TTS["Web Speech TTS Narrator"] --> REC
+        
+        COMP --> VIEW["Live 60 FPS Viewport & Timeline Scrubber"]
+        COMP --> REC
+        
+        REC --> EXPORT["Multi-Format Export<br/>(WebM, MP4, Animated GIF)"]
+    end
 ```
 
 ---
 
-## Quick Start
+## 🚀 Quick Start
 
 ### Prerequisites
-- Any modern web browser (Google Chrome, Microsoft Edge, Brave, Firefox, Safari).
-- Any local static file server (e.g. Node.js `serve` or Python `http.server`).
+- Any modern web browser with WebGL 2.0 support (Chrome, Edge, Brave, Firefox, Safari).
+- Node.js (v18+) or Python for local preview.
 
 ### Running Locally
 
 ```bash
-# Clone the repository
+# 1. Clone the repository
 git clone https://github.com/jojin1709/motion-canvas-studio-.git
 cd motion-canvas-studio-
 
-# Run with Node.js
+# 2. Run local development server
 npx serve .
-
-# Or run with Python
-python -m http.server 3000
 ```
 
 Open `http://localhost:3000` in your browser.
 
 ---
 
-## Deploy to Vercel
+## ☁️ Deployment
 
-FluxFrame contains a pre-configured [vercel.json](vercel.json) with security headers, clean URLs, and static asset caching.
+### Cloudflare Pages (Recommended)
 
-### Option 1: Vercel CLI
+FluxFrame includes native Cloudflare Pages Functions (`/functions/api/ai.js`):
+
 ```bash
-npx vercel
+# Deploy with Wrangler CLI
+npx wrangler pages deploy . --project-name=fluxframe-studio
 ```
 
-### Option 2: GitHub Dashboard
-1. Push this repository to your GitHub account.
-2. Go to [vercel.com/new](https://vercel.com/new).
-3. Import **`motion-canvas-studio-`** and click **Deploy**.
+### Vercel / Netlify / GitHub Pages
+
+Because FluxFrame is static HTML5/JS with client-side WebGL, it can be deployed to any static host without configuration.
 
 ---
 
-## Common Questions
+## 🔒 Privacy & Zero Data Retention
 
-### Is Cloudflare or a backend server needed?
-**No.** FluxFrame is 100% client-side HTML, CSS, JavaScript, and WebGL. It runs entirely inside the user's browser, meaning you only need standard static hosting (like Vercel, Netlify, or GitHub Pages).
-
-### How does video export work without FFmpeg?
-FluxFrame captures the active canvas frame buffer using `canvas.captureStream(30)` and pairs it with the synthesized Web Audio track using the browser's native `MediaRecorder` API to create a high-quality `.webm` file.
-
-### Can I add custom fonts or visual effects?
-Yes! Fonts can be loaded via Google Fonts in `index.html`, and new GLSL shaders can be added directly inside `shaders` in `app.js`.
+- **No Remote Video Processing**: All frames are rendered locally on your device's GPU.
+- **No File Upload to Cloud Servers**: User-uploaded logos, images, audio, and videos remain strictly inside browser memory (`Blob` / `FileReader`).
+- **No Tracking**: No telemetry, analytics, or user profiling cookies.
 
 ---
 
-## Developer
+## 👨‍💻 Developer & Credits
 
 **Developed and engineered by [JOJIN JOHN](https://github.com/jojin1709)**
 
+- GitHub: [@jojin1709](https://github.com/jojin1709)
+- Repository: [https://github.com/jojin1709/motion-canvas-studio-](https://github.com/jojin1709/motion-canvas-studio-)
+
 ---
 
-## License
+## 📄 License
 
-This project is licensed under the **[MIT License](LICENSE)**. Feel free to use, modify, and distribute it for personal or commercial projects.
+This project is licensed under the **[MIT License](LICENSE)**. Feel free to use, customize, and build commercial projects with FluxFrame Studio Pro.
