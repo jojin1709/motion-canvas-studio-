@@ -3,9 +3,12 @@
 // ==========================================
 
 // Initialize Lucide Icons
-if (window.lucide) {
-  window.lucide.createIcons();
+function refreshIcons() {
+  if (window.lucide) {
+    window.lucide.createIcons();
+  }
 }
+refreshIcons();
 
 // DOM Elements
 const canvas = document.getElementById('renderCanvas');
@@ -18,6 +21,7 @@ const motionSelect = document.getElementById('motionSelect');
 const styleSelect = document.getElementById('styleSelect');
 const durationSelect = document.getElementById('durationSelect');
 const aspectSelect = document.getElementById('aspectSelect');
+const alignSelect = document.getElementById('alignSelect');
 const progressBar = document.getElementById('progressBar');
 const progressHandle = document.getElementById('progressHandle');
 const timelineWrap = document.getElementById('timelineWrap');
@@ -35,9 +39,24 @@ const customColorPicker = document.getElementById('customColorPicker');
 const logoUpload = document.getElementById('logoUpload');
 const logoFileName = document.getElementById('logoFileName');
 const removeLogoBtn = document.getElementById('removeLogoBtn');
+const logoPosSelect = document.getElementById('logoPosSelect');
 const audioToggle = document.getElementById('audioToggle');
 const audioSoundSelect = document.getElementById('audioSoundSelect');
 const audioStatusText = document.getElementById('audioStatusText');
+const customAudioUpload = document.getElementById('customAudioUpload');
+const customAudioLabel = document.getElementById('customAudioLabel');
+const customAudioOption = document.getElementById('customAudioOption');
+const speedSlider = document.getElementById('speedSlider');
+const speedValueLabel = document.getElementById('speedValueLabel');
+const grainToggle = document.getElementById('grainToggle');
+const grainToggleKnob = document.getElementById('grainToggleKnob');
+const snapshotBtn = document.getElementById('snapshotBtn');
+const shareLinkBtn = document.getElementById('shareLinkBtn');
+const aiPromptInput = document.getElementById('aiPromptInput');
+const aiGenerateBtn = document.getElementById('aiGenerateBtn');
+const quickPresetSelect = document.getElementById('quickPresetSelect');
+const toast = document.getElementById('toast');
+const toastMessage = document.getElementById('toastMessage');
 
 // State
 let accent = '#6366f1';
@@ -45,14 +64,19 @@ let playing = true;
 let startTime = performance.now();
 let currentTime = 0;
 let duration = 5;
+let speed = 1.0;
+let enableFilmGrain = false;
+let textAlign = 'center';
 let raf;
 let isScrubbing = false;
 let userLogo = null;
+let customAudioElement = null;
+let customAudioBuffer = null;
 let audioEnabled = true;
 let audioCtx = null;
 
 // ==========================================
-// 8 HIGH-IMPACT DISTINCT GLSL SHADERS
+// 8 ADVANCED GLSL PROCEDURAL SHADERS
 // ==========================================
 const glCanvas = document.createElement('canvas');
 const gl = glCanvas.getContext('webgl', { alpha: false, antialias: true, preserveDrawingBuffer: true });
@@ -192,7 +216,6 @@ const shaders = {
         float glow = exp(-abs(p.y - horizon) * 12.0);
         col += vec3(0.95, 0.15, 0.65) * glow * 0.55;
         
-        // Sun at center horizon
         float sunDist = length(p - vec2(0.0, horizon + 0.08));
         float sun = 0.03 / (sunDist + 0.06);
         col += vec3(0.98, 0.45, 0.1) * sun * 0.8;
@@ -354,6 +377,21 @@ function hexToRgb(h) {
 }
 
 // ==========================================
+// TOAST NOTIFICATION UTILITY
+// ==========================================
+let toastTimeout;
+function showToast(msg) {
+  toastMessage.textContent = msg;
+  toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+  toast.classList.add('translate-y-0', 'opacity-100');
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => {
+    toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+    toast.classList.remove('translate-y-0', 'opacity-100');
+  }, 2500);
+}
+
+// ==========================================
 // RESIZING & RESPONSIVE VIEWPORT
 // ==========================================
 function updateCanvasSize() {
@@ -386,7 +424,7 @@ function updateCanvasSize() {
 }
 
 // ==========================================
-// GENERATIVE WEB AUDIO ENGINE
+// GENERATIVE & CUSTOM AUDIO ENGINE
 // ==========================================
 function initAudio() {
   if (!audioCtx) {
@@ -402,6 +440,20 @@ function createGenerativeAudioNode(destination) {
   if (!audioEnabled || !audioCtx) return null;
 
   const soundType = audioSoundSelect.value || 'ambient';
+  
+  // Custom audio playback
+  if (soundType === 'custom' && customAudioElement) {
+    try {
+      const source = audioCtx.createMediaElementSource(customAudioElement);
+      source.connect(destination || audioCtx.destination);
+      customAudioElement.currentTime = currentTime % customAudioElement.duration;
+      if (playing) customAudioElement.play();
+      return { customSource: source };
+    } catch (e) {
+      console.warn('Custom audio source error:', e);
+    }
+  }
+
   const masterGain = audioCtx.createGain();
   masterGain.gain.setValueAtTime(0.24, audioCtx.currentTime);
   masterGain.connect(destination || audioCtx.destination);
@@ -410,13 +462,13 @@ function createGenerativeAudioNode(destination) {
   let cutoff = 340;
 
   if (soundType === 'solar') {
-    freqs = [73.42, 110.0, 146.83, 220.0, 293.66]; // D Maj energetic
+    freqs = [73.42, 110.0, 146.83, 220.0, 293.66]; // D Maj
     cutoff = 480;
   } else if (soundType === 'cosmic') {
-    freqs = [55.0, 110.0, 164.81, 220.0]; // A Minor deep cosmic
+    freqs = [55.0, 110.0, 164.81, 220.0]; // A Minor
     cutoff = 220;
   } else if (soundType === 'lofi') {
-    freqs = [87.31, 130.81, 164.81, 196.0]; // F Maj7 warm
+    freqs = [87.31, 130.81, 164.81, 196.0]; // F Maj7
     cutoff = 380;
   }
 
@@ -453,14 +505,14 @@ function render(time) {
   const currentStyle = styleSelect.value || 'silk';
   const progData = programs[currentStyle] || programs.silk;
 
-  // 1. Render WebGL Shader
+  // 1. Render WebGL Shader with Speed
   gl.useProgram(progData.program);
   gl.bindBuffer(gl.ARRAY_BUFFER, quadBuffer);
   const posLoc = gl.getAttribLocation(progData.program, 'position');
   gl.enableVertexAttribArray(posLoc);
   gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
 
-  gl.uniform1f(progData.tLoc, currentTime);
+  gl.uniform1f(progData.tLoc, currentTime * speed);
   gl.uniform2f(progData.rLoc, glCanvas.width, glCanvas.height);
   gl.uniform3fv(progData.aLoc, new Float32Array(hexToRgb(accent)));
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
@@ -473,14 +525,41 @@ function render(time) {
 
   const scale = Math.min(w, h) / 1000;
 
-  // 3. Vignette Mask
+  // 3. Film Grain Overlay (Optional)
+  if (enableFilmGrain) {
+    ctx.save();
+    const grainSize = 128;
+    const imgData = ctx.createImageData(grainSize, grainSize);
+    const buf32 = new Uint32Array(imgData.data.buffer);
+    for (let i = 0; i < buf32.length; i++) {
+      if (Math.random() < 0.5) {
+        buf32[i] = 0x08ffffff; // subtle white speck
+      }
+    }
+    const grainPattern = ctx.createPattern(
+      (() => {
+        const off = document.createElement('canvas');
+        off.width = grainSize;
+        off.height = grainSize;
+        off.getContext('2d').putImageData(imgData, 0, 0);
+        return off;
+      })(),
+      'repeat'
+    );
+    ctx.fillStyle = grainPattern;
+    ctx.globalAlpha = 0.25;
+    ctx.fillRect(0, 0, w, h);
+    ctx.restore();
+  }
+
+  // 4. Vignette Mask
   const vignette = ctx.createRadialGradient(w / 2, h / 2, Math.min(w, h) * 0.25, w / 2, h / 2, Math.max(w, h) * 0.72);
   vignette.addColorStop(0, 'rgba(0,0,0,0)');
   vignette.addColorStop(1, 'rgba(0,0,0,0.52)');
   ctx.fillStyle = vignette;
   ctx.fillRect(0, 0, w, h);
 
-  // 4. Kinetic Motion Easing
+  // 5. Kinetic Motion Easing
   const motionMode = motionSelect.value || 'fade-rise';
   let easeIn = 1 - Math.pow(1 - Math.min(progress / 0.2, 1), 3);
   let fadeOut = Math.min(1, Math.max(0, (progress - 0.88) / 0.12));
@@ -501,25 +580,50 @@ function render(time) {
     }
   }
 
-  // 5. Draw Optional Logo
+  // 6. Draw Logo with Position Controls
   let contentOffsetY = 0;
+  const logoPos = logoPosSelect ? logoPosSelect.value : 'above-title';
+  
   if (userLogo && userLogo.complete) {
     ctx.save();
     ctx.globalAlpha = masterAlpha;
-    const logoMaxDim = 95 * scale;
+    const logoMaxDim = 90 * scale;
     let lw = userLogo.width;
     let lh = userLogo.height;
     const logoRatio = Math.min(logoMaxDim / lw, logoMaxDim / lh);
     lw *= logoRatio;
     lh *= logoRatio;
 
-    const logoY = h * 0.32 - lh / 2 + animOffsetY;
-    ctx.drawImage(userLogo, w / 2 - lw / 2, logoY, lw, lh);
-    contentOffsetY = lh * 0.42;
+    let lx = w / 2 - lw / 2;
+    let ly = h * 0.32 - lh / 2 + animOffsetY;
+
+    if (logoPos === 'top-left') {
+      lx = w * 0.08;
+      ly = h * 0.08;
+    } else if (logoPos === 'top-center') {
+      lx = w / 2 - lw / 2;
+      ly = h * 0.08;
+    } else if (logoPos === 'bottom-right') {
+      lx = w * 0.92 - lw;
+      ly = h * 0.92 - lh;
+    } else {
+      contentOffsetY = lh * 0.42;
+    }
+
+    ctx.drawImage(userLogo, lx, ly, lw, lh);
     ctx.restore();
   }
 
-  // 6. Draw Category Badge Pill
+  // Horizontal text alignment setup
+  let anchorX = w / 2;
+  ctx.textAlign = textAlign;
+  if (textAlign === 'left') {
+    anchorX = w * 0.12;
+  } else if (textAlign === 'right') {
+    anchorX = w * 0.88;
+  }
+
+  // 7. Draw Category Badge Pill
   const badgeText = (badgeInput.value || '').trim().toUpperCase();
   if (badgeText) {
     ctx.save();
@@ -528,32 +632,33 @@ function render(time) {
     const textWidth = ctx.measureText(badgeText).width;
     const pillW = textWidth + 28 * scale;
     const pillH = 26 * scale;
-    const pillX = w / 2 - pillW / 2;
+    
+    let pillX = anchorX - pillW / 2;
+    if (textAlign === 'left') pillX = anchorX;
+    if (textAlign === 'right') pillX = anchorX - pillW;
+
     const pillY = h * 0.38 + contentOffsetY + animOffsetY;
 
-    // Glass pill background
     ctx.fillStyle = 'rgba(10, 14, 28, 0.75)';
     ctx.beginPath();
     ctx.roundRect(pillX, pillY, pillW, pillH, 13 * scale);
     ctx.fill();
 
-    // Accent border
     ctx.strokeStyle = accent;
     ctx.lineWidth = 1.5 * scale;
     ctx.stroke();
 
-    // Text inside pill
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillStyle = '#ffffff';
-    ctx.fillText(badgeText, w / 2, pillY + pillH / 2);
+    ctx.fillText(badgeText, pillX + pillW / 2, pillY + pillH / 2);
     ctx.restore();
     contentOffsetY += pillH * 0.8;
   }
 
-  // 7. Kinetic Typography Rendering
+  // 8. Kinetic Typography Rendering
   ctx.save();
-  ctx.textAlign = 'center';
+  ctx.textAlign = textAlign;
   ctx.textBaseline = 'middle';
   ctx.globalAlpha = masterAlpha;
 
@@ -566,7 +671,6 @@ function render(time) {
 
   const centerY = h * 0.52 + contentOffsetY + animOffsetY;
 
-  // Title rendering with glow
   ctx.font = `800 ${mainSize * animScale}px '${currentFont}', sans-serif`;
   ctx.shadowColor = accent;
   ctx.shadowBlur = 24 * scale;
@@ -578,11 +682,11 @@ function render(time) {
     const line1 = words.slice(0, half).join(' ');
     const line2 = words.slice(half).join(' ');
 
-    ctx.fillText(line1, w / 2, centerY - mainSize * 0.55);
+    ctx.fillText(line1, anchorX, centerY - mainSize * 0.55);
     ctx.fillStyle = accent;
-    ctx.fillText(line2, w / 2, centerY + mainSize * 0.55);
+    ctx.fillText(line2, anchorX, centerY + mainSize * 0.55);
   } else {
-    ctx.fillText(rawTitle, w / 2, centerY);
+    ctx.fillText(rawTitle, anchorX, centerY);
   }
 
   // Subtitle
@@ -590,16 +694,17 @@ function render(time) {
   ctx.globalAlpha = masterAlpha * 0.86;
   ctx.font = `500 ${Math.max(18, 25 * scale)}px 'Inter', sans-serif`;
   ctx.fillStyle = '#cbd5e1';
-  ctx.fillText(sub, w / 2, centerY + (words.length > 2 ? mainSize * 1.45 : mainSize * 1.15));
+  ctx.fillText(sub, anchorX, centerY + (words.length > 2 ? mainSize * 1.45 : mainSize * 1.15));
 
   // Studio Watermark
   ctx.globalAlpha = 0.45;
+  ctx.textAlign = 'center';
   ctx.font = `700 ${Math.max(11, 13 * scale)}px '${currentFont}', sans-serif`;
   ctx.fillStyle = '#94a3b8';
   ctx.fillText('FLUXFRAME STUDIO', w / 2, h * 0.93);
   ctx.restore();
 
-  // 8. Timeline Sync
+  // 9. Timeline Progress Bar Sync
   const pct = progress * 100;
   progressBar.style.width = `${pct}%`;
   if (progressHandle) progressHandle.style.left = `${pct}%`;
@@ -639,13 +744,168 @@ function updatePlayButtonUI(isPlaying) {
     playBtnText.textContent = 'Play';
     playIcon.setAttribute('data-lucide', 'play');
   }
-  if (window.lucide) window.lucide.createIcons();
+  refreshIcons();
 }
 
 function updateSettings() {
   duration = Number(durationSelect.value);
   updateCanvasSize();
   restart();
+}
+
+// ==========================================
+// AI PROMPT-TO-SCENE SMART ASSISTANT
+// ==========================================
+function generateSceneFromPrompt(prompt) {
+  if (!prompt || !prompt.trim()) return;
+  const p = prompt.toLowerCase();
+
+  let selectedStyle = 'silk';
+  let selectedAccent = '#6366f1';
+  let selectedFont = 'Plus Jakarta Sans';
+  let selectedMotion = 'fade-rise';
+  let badge = 'ANNOUNCEMENT';
+  let title = 'BUILD THE FUTURE';
+  let subtitle = 'The next generation platform is finally here';
+
+  if (p.includes('cyber') || p.includes('synth') || p.includes('gaming') || p.includes('crypto')) {
+    selectedStyle = 'cyber';
+    selectedAccent = '#ec4899';
+    selectedFont = 'Space Grotesk';
+    selectedMotion = 'glitch-flash';
+    badge = 'SYNTHWAVE 2026';
+    title = 'NEON PROTOCOL';
+    subtitle = 'Decentralized high-speed gaming infrastructure';
+  } else if (p.includes('solar') || p.includes('fire') || p.includes('keynote') || p.includes('summit')) {
+    selectedStyle = 'solar';
+    selectedAccent = '#f59e0b';
+    selectedFont = 'Outfit';
+    selectedMotion = 'scale-pop';
+    badge = 'GLOBAL KEYNOTE';
+    title = 'IGNITE REVOLUTION';
+    subtitle = 'Streaming worldwide live on all platforms';
+  } else if (p.includes('aurora') || p.includes('space') || p.includes('nature') || p.includes('ai')) {
+    selectedStyle = 'aurora';
+    selectedAccent = '#10b981';
+    selectedFont = 'Plus Jakarta Sans';
+    selectedMotion = 'kinetic-drift';
+    badge = 'AUTONOMOUS AI';
+    title = 'QUANTUM INTELLIGENCE';
+    subtitle = 'Self-evolving neural computing architecture';
+  } else if (p.includes('luxury') || p.includes('fashion') || p.includes('perfume') || p.includes('editorial')) {
+    selectedStyle = 'prism';
+    selectedAccent = '#a855f7';
+    selectedFont = 'Cinzel';
+    selectedMotion = 'fade-rise';
+    badge = 'EDITION NO. 1';
+    title = 'ETERNAL BEAUTY';
+    subtitle = 'Crafted with timeless precision and care';
+  } else if (p.includes('warp') || p.includes('speed') || p.includes('fast') || p.includes('cloud')) {
+    selectedStyle = 'warp';
+    selectedAccent = '#06b6d4';
+    selectedFont = 'JetBrains Mono';
+    selectedMotion = 'scale-pop';
+    badge = 'ULTRA SPEED';
+    title = 'HYPER PERFORMANCE';
+    subtitle = 'Sub-millisecond global execution engine';
+  } else if (p.includes('chrome') || p.includes('metal') || p.includes('car') || p.includes('hardware')) {
+    selectedStyle = 'chrome';
+    selectedAccent = '#06b6d4';
+    selectedFont = 'Syne';
+    selectedMotion = 'scale-pop';
+    badge = 'FLAGSHIP HARDWARE';
+    title = 'PRECISION CRAFT';
+    subtitle = 'Aerospace grade materials forged for durability';
+  }
+
+  // Apply generated scene
+  badgeInput.value = badge;
+  titleInput.value = title;
+  subtitleInput.value = subtitle;
+  styleSelect.value = selectedStyle;
+  fontSelect.value = selectedFont;
+  motionSelect.value = selectedMotion;
+  accent = selectedAccent;
+  customColorPicker.value = accent;
+  document.documentElement.style.setProperty('--accent', accent);
+
+  document.querySelectorAll('.style-card').forEach(c => c.classList.toggle('active', c.dataset.style === selectedStyle));
+  document.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c.dataset.color === accent));
+  
+  showToast(`✨ Generated scene for "${prompt.slice(0, 20)}..."`);
+  updateSettings();
+}
+
+// AI Button & Enter key
+aiGenerateBtn.addEventListener('click', () => generateSceneFromPrompt(aiPromptInput.value));
+aiPromptInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') generateSceneFromPrompt(aiPromptInput.value);
+});
+
+// ==========================================
+// 4K SNAPSHOT FRAME DOWNLOAD (PNG)
+// ==========================================
+snapshotBtn.addEventListener('click', () => {
+  const link = document.createElement('a');
+  link.download = `fluxframe-poster-${styleSelect.value}-${Date.now()}.png`;
+  link.href = canvas.toDataURL('image/png', 1.0);
+  link.click();
+  showToast('📸 4K Poster Snapshot downloaded!');
+});
+
+// ==========================================
+// SHAREABLE SCENE URL (HASH ENCODING)
+// ==========================================
+shareLinkBtn.addEventListener('click', () => {
+  const state = {
+    b: badgeInput.value,
+    t: titleInput.value,
+    s: subtitleInput.value,
+    st: styleSelect.value,
+    c: accent,
+    f: fontSelect.value,
+    m: motionSelect.value,
+    a: aspectSelect.value,
+    d: durationSelect.value
+  };
+  const hash = encodeURIComponent(JSON.stringify(state));
+  const fullUrl = `${window.location.origin}${window.location.pathname}#scene=${hash}`;
+  
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(fullUrl);
+    showToast('🔗 Shareable scene URL copied to clipboard!');
+  }
+});
+
+// Load state from Hash on start
+function loadSceneFromHash() {
+  if (window.location.hash && window.location.hash.includes('scene=')) {
+    try {
+      const raw = window.location.hash.split('scene=')[1];
+      const state = JSON.parse(decodeURIComponent(raw));
+      if (state.b) badgeInput.value = state.b;
+      if (state.t) titleInput.value = state.t;
+      if (state.s) subtitleInput.value = state.s;
+      if (state.st) styleSelect.value = state.st;
+      if (state.c) {
+        accent = state.c;
+        customColorPicker.value = accent;
+        document.documentElement.style.setProperty('--accent', accent);
+      }
+      if (state.f) fontSelect.value = state.f;
+      if (state.m) motionSelect.value = state.m;
+      if (state.a) aspectSelect.value = state.a;
+      if (state.d) durationSelect.value = state.d;
+
+      document.querySelectorAll('.style-card').forEach(c => c.classList.toggle('active', c.dataset.style === state.st));
+      document.querySelectorAll('.seg-btn').forEach(b => {
+        if (b.dataset.aspect === state.a || b.dataset.duration === state.d) b.classList.add('active');
+      });
+      showToast('⚡ Loaded shared scene!');
+    } catch (e) {
+      console.warn('Could not parse shared scene hash:', e);
+    }
+  }
 }
 
 // ==========================================
@@ -664,7 +924,6 @@ styleCards.forEach(card => {
     styleSelect.value = style;
     styleCards.forEach(c => c.classList.toggle('active', c === card));
     
-    // Suggest appropriate accent colors per style
     if (style === 'solar') accent = '#f59e0b';
     else if (style === 'aurora') accent = '#10b981';
     else if (style === 'cyber') accent = '#ec4899';
@@ -676,7 +935,7 @@ styleCards.forEach(card => {
 
     customColorPicker.value = accent;
     document.documentElement.style.setProperty('--accent', accent);
-    chips.forEach(c => c.classList.toggle('active', c.dataset.color === accent));
+    document.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c.dataset.color === accent));
     restart();
   });
 });
@@ -703,21 +962,48 @@ durationButtons.forEach(btn => {
   });
 });
 
+// Segmented Text Alignment
+const alignButtons = document.querySelectorAll('#alignControl .seg-btn');
+alignButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    textAlign = btn.dataset.align;
+    alignSelect.value = textAlign;
+    alignButtons.forEach(b => b.classList.toggle('active', b === btn));
+    render(currentTime);
+  });
+});
+
+// Speed Slider
+speedSlider.addEventListener('input', (e) => {
+  speed = parseFloat(e.target.value);
+  speedValueLabel.textContent = `${speed.toFixed(1)}x`;
+  render(currentTime);
+});
+
+// Film Grain Toggle
+grainToggle.addEventListener('click', () => {
+  enableFilmGrain = !enableFilmGrain;
+  grainToggle.classList.toggle('bg-brand-500', enableFilmGrain);
+  grainToggle.classList.toggle('bg-dark-700', !enableFilmGrain);
+  grainToggleKnob.classList.toggle('translate-x-5', enableFilmGrain);
+  render(currentTime);
+});
+
 // Live input re-renders
 titleInput.addEventListener('input', () => render(currentTime));
 subtitleInput.addEventListener('input', () => render(currentTime));
 badgeInput.addEventListener('input', () => render(currentTime));
 fontSelect.addEventListener('change', () => render(currentTime));
 motionSelect.addEventListener('change', () => restart());
+if (logoPosSelect) logoPosSelect.addEventListener('change', () => render(currentTime));
 
 // Color Chips
-const chips = document.querySelectorAll('.chip');
-chips.forEach(chip => {
+document.querySelectorAll('.chip').forEach(chip => {
   chip.addEventListener('click', () => {
     accent = chip.dataset.color;
     customColorPicker.value = accent;
     document.documentElement.style.setProperty('--accent', accent);
-    chips.forEach(c => c.classList.toggle('active', c === chip));
+    document.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c === chip));
     restart();
   });
 });
@@ -726,55 +1012,26 @@ chips.forEach(chip => {
 customColorPicker.addEventListener('input', (e) => {
   accent = e.target.value;
   document.documentElement.style.setProperty('--accent', accent);
-  chips.forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
   render(currentTime);
 });
 
-// Quick Presets
-document.querySelectorAll('.preset-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const p = btn.dataset.preset;
-    if (p === 'launch') {
-      badgeInput.value = 'VERSION 2.0';
-      titleInput.value = 'SUPERCHARGE WORKFLOW';
-      subtitleInput.value = 'Built for high performance teams & creators';
-      styleSelect.value = 'silk';
-      accent = '#6366f1';
-    } else if (p === 'solar') {
-      badgeInput.value = 'LIVE KEYNOTE';
-      titleInput.value = 'GLOBAL SUMMIT 2026';
-      subtitleInput.value = 'Streamed worldwide on October 24th';
-      styleSelect.value = 'solar';
-      accent = '#f59e0b';
-    } else if (p === 'cyber') {
-      badgeInput.value = 'SYNTHWAVE';
-      titleInput.value = 'NEON REVOLUTION';
-      subtitleInput.value = 'Procedural retro-future audio visualizer';
-      styleSelect.value = 'cyber';
-      accent = '#f43f5e';
-    } else if (p === 'aurora') {
-      badgeInput.value = 'NATURE OF AI';
-      titleInput.value = 'QUANTUM HORIZONS';
-      subtitleInput.value = 'Deep atmospheric northern energy waves';
-      styleSelect.value = 'aurora';
-      accent = '#10b981';
-    } else if (p === 'reels') {
-      badgeInput.value = 'TRENDING NOW';
-      titleInput.value = 'CREATE MOTION';
-      subtitleInput.value = 'Instant client-side procedural video generator';
-      styleSelect.value = 'prism';
-      aspectSelect.value = '9:16';
-      accent = '#a855f7';
-    }
-
-    customColorPicker.value = accent;
-    document.documentElement.style.setProperty('--accent', accent);
-
-    styleCards.forEach(c => c.classList.toggle('active', c.dataset.style === styleSelect.value));
-    aspectButtons.forEach(b => b.classList.toggle('active', b.dataset.aspect === aspectSelect.value));
-    chips.forEach(c => c.classList.toggle('active', c.dataset.color === accent));
+// Quick Presets Trigger
+quickPresetSelect.addEventListener('change', (e) => {
+  const p = e.target.value;
+  if (p === 'launch') generateSceneFromPrompt('Product launch modern feature drop');
+  else if (p === 'solar') generateSceneFromPrompt('Solar flare fiery keynote summit');
+  else if (p === 'cyber') generateSceneFromPrompt('Cyberpunk synthwave gaming tournament');
+  else if (p === 'aurora') generateSceneFromPrompt('Cosmic aurora northern intelligence');
+  else if (p === 'reels') {
+    generateSceneFromPrompt('Viral story reel trend');
+    aspectSelect.value = '9:16';
+    aspectButtons.forEach(b => b.classList.toggle('active', b.dataset.aspect === '9:16'));
     updateSettings();
-  });
+  } else if (p === 'podcast') {
+    generateSceneFromPrompt('Podcast audio episode discussion');
+  }
+  quickPresetSelect.selectedIndex = 0;
 });
 
 // Play / Pause Toggle
@@ -800,6 +1057,13 @@ clearBtn.addEventListener('click', () => {
   aspectSelect.value = '16:9';
   fontSelect.value = 'Plus Jakarta Sans';
   motionSelect.value = 'fade-rise';
+  speedSlider.value = 1.0;
+  speed = 1.0;
+  speedValueLabel.textContent = '1.0x';
+  enableFilmGrain = false;
+  grainToggle.classList.remove('bg-brand-500');
+  grainToggle.classList.add('bg-dark-700');
+  grainToggleKnob.classList.remove('translate-x-5');
   accent = '#6366f1';
   customColorPicker.value = accent;
   document.documentElement.style.setProperty('--accent', accent);
@@ -807,12 +1071,13 @@ clearBtn.addEventListener('click', () => {
   styleCards.forEach(c => c.classList.toggle('active', c.dataset.style === 'silk'));
   aspectButtons.forEach(b => b.classList.toggle('active', b.dataset.aspect === '16:9'));
   durationButtons.forEach(b => b.classList.toggle('active', b.dataset.duration === '5'));
-  chips.forEach(c => c.classList.toggle('active', c.dataset.color === accent));
+  document.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c.dataset.color === accent));
 
   userLogo = null;
   logoUpload.value = '';
-  logoFileName.textContent = 'Upload PNG or SVG Logo';
+  logoFileName.textContent = 'Upload PNG / SVG Logo';
   removeLogoBtn.style.display = 'none';
+  showToast('Reset to default scene');
   updateSettings();
 });
 
@@ -821,7 +1086,7 @@ logoUpload.addEventListener('change', (e) => {
   const file = e.target.files[0];
   if (!file) return;
 
-  logoFileName.textContent = file.name.length > 20 ? file.name.slice(0, 17) + '...' : file.name;
+  logoFileName.textContent = file.name.length > 18 ? file.name.slice(0, 15) + '...' : file.name;
   removeLogoBtn.style.display = 'grid';
 
   const reader = new FileReader();
@@ -839,9 +1104,25 @@ logoUpload.addEventListener('change', (e) => {
 removeLogoBtn.addEventListener('click', () => {
   userLogo = null;
   logoUpload.value = '';
-  logoFileName.textContent = 'Upload PNG or SVG Logo';
+  logoFileName.textContent = 'Upload PNG / SVG Logo';
   removeLogoBtn.style.display = 'none';
   render(currentTime);
+});
+
+// Custom Audio File Upload
+customAudioUpload.addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  initAudio();
+  const fileUrl = URL.createObjectURL(file);
+  customAudioElement = new Audio(fileUrl);
+  customAudioElement.loop = true;
+  customAudioLabel.textContent = file.name.length > 15 ? file.name.slice(0, 12) + '...' : file.name;
+  
+  customAudioOption.disabled = false;
+  audioSoundSelect.value = 'custom';
+  showToast(`🎵 Loaded custom audio: ${file.name}`);
 });
 
 // Audio Toggle
@@ -977,12 +1258,14 @@ exportBtn.addEventListener('click', async () => {
   renderStatus.className = 'font-bold text-emerald-400 flex items-center gap-1.5';
   exportBtn.disabled = false;
   exportBtnText.textContent = 'Export Video';
+  showToast('🎉 WebM video exported successfully!');
   restart();
 });
 
 // ==========================================
 // INITIALIZATION
 // ==========================================
+loadSceneFromHash();
 updateCanvasSize();
 render(0);
 loop(performance.now());
