@@ -250,13 +250,9 @@ function updateCanvasSize() {
   glCanvas.width = w;
   glCanvas.height = h;
 
-  const container = document.getElementById('stageContainer');
-  const maxW = Math.max(container.clientWidth - 48, 300);
-  const maxH = Math.max(container.clientHeight - 48, 300);
-  const scale = Math.min(maxW / w, maxH / h, 1);
-
-  canvas.style.width = `${Math.round(w * scale)}px`;
-  canvas.style.height = `${Math.round(h * scale)}px`;
+  canvas.style.aspectRatio = aspect === '9:16' ? '9 / 16' : (aspect === '1:1' ? '1 / 1' : '16 / 9');
+  canvas.style.width = 'auto';
+  canvas.style.height = 'auto';
 
   gl.viewport(0, 0, w, h);
 }
