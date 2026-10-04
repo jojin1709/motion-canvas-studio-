@@ -575,22 +575,29 @@ function render(time) {
 
   // 5. Kinetic Motion Easing
   const motionMode = motionSelect.value || 'fade-rise';
-  let easeIn = 1 - Math.pow(1 - Math.min(progress / 0.2, 1), 3);
-  let fadeOut = Math.min(1, Math.max(0, (progress - 0.88) / 0.12));
+  let easeIn = 1 - Math.pow(1 - Math.min(progress / 0.12, 1), 3);
+  let fadeOut = Math.min(1, Math.max(0, (progress - 0.90) / 0.10));
   let masterAlpha = easeIn * (1 - fadeOut);
 
   let animScale = 1.0;
   let animOffsetY = (1 - easeIn) * 35 * scale;
 
-  if (motionMode === 'scale-pop') {
-    animScale = 0.84 + easeIn * 0.16;
-    animOffsetY = (1 - easeIn) * 15 * scale;
-  } else if (motionMode === 'kinetic-drift') {
-    animScale = 1.0 + progress * 0.07;
-    animOffsetY = (1 - easeIn) * 22 * scale;
-  } else if (motionMode === 'glitch-flash') {
-    if (progress < 0.08) {
-      masterAlpha *= (Math.sin(progress * 120.0) > 0 ? 1.0 : 0.2);
+  if (!playing || isScrubbing) {
+    masterAlpha = 1.0;
+    animScale = 1.0;
+    animOffsetY = 0;
+  } else {
+    masterAlpha = Math.max(0.15, masterAlpha);
+    if (motionMode === 'scale-pop') {
+      animScale = 0.88 + easeIn * 0.12;
+      animOffsetY = (1 - easeIn) * 15 * scale;
+    } else if (motionMode === 'kinetic-drift') {
+      animScale = 1.0 + progress * 0.07;
+      animOffsetY = (1 - easeIn) * 22 * scale;
+    } else if (motionMode === 'glitch-flash') {
+      if (progress < 0.08) {
+        masterAlpha *= (Math.sin(progress * 120.0) > 0 ? 1.0 : 0.3);
+      }
     }
   }
 
@@ -773,7 +780,30 @@ async function generateSceneWithAI(prompt) {
   aiBtnLabel.textContent = 'Thinking... ⏳';
   aiGenerateBtn.disabled = true;
 
-  // If Cloudflare Account ID & Token are provided in LocalStorage, query Cloudflare Workers AI edge!
+  // 1. Try Cloudflare Pages /api/ai Edge Function first
+  try {
+    const res = await fetch('/api/ai', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      const rawText = data.response || (typeof data === 'string' ? data : JSON.stringify(data));
+      const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[0]);
+        applyParsedScene(parsed, prompt);
+        aiBtnLabel.textContent = 'Generate ✨';
+        aiGenerateBtn.disabled = false;
+        return;
+      }
+    }
+  } catch (err) {
+    console.warn('Pages function note:', err);
+  }
+
+  // 2. If Cloudflare Account ID & Token are provided in LocalStorage, query Cloudflare Workers AI edge!
   if (cfAccountId && cfApiToken) {
     try {
       showToast('☁️ Calling Cloudflare Workers AI edge...');
@@ -814,7 +844,7 @@ async function generateSceneWithAI(prompt) {
     }
   }
 
-  // Instant Local AI Fallback (100% Client-Side & Private)
+  // 3. Instant Local AI Fallback (100% Client-Side & Private)
   generateSceneFromPrompt(prompt);
   aiBtnLabel.textContent = 'Generate ✨';
   aiGenerateBtn.disabled = false;
