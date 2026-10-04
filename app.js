@@ -2555,6 +2555,63 @@ function finishExport(format) {
 }
 
 // ==========================================
+// STUDIO CREATOR KEYBOARD SHORTCUTS
+// ==========================================
+window.addEventListener('keydown', (e) => {
+  const tag = e.target.tagName ? e.target.tagName.toLowerCase() : '';
+  if (tag === 'input' || tag === 'textarea' || tag === 'select' || e.target.isContentEditable) {
+    return;
+  }
+
+  // Space: Play / Pause toggle
+  if (e.code === 'Space') {
+    e.preventDefault();
+    initAudio();
+    playing = !playing;
+    if (playing) {
+      startTime = performance.now() - (currentTime * 1000);
+    }
+    updatePlayButtonUI(playing);
+    showToast(playing ? '▶️ Playing' : '⏸️ Paused');
+  }
+  // R: Restart playback
+  else if (e.key === 'r' || e.key === 'R') {
+    e.preventDefault();
+    restart();
+    showToast('🔄 Restarted sequence');
+  }
+  // M: Toggle audio mute
+  else if (e.key === 'm' || e.key === 'M') {
+    e.preventDefault();
+    initAudio();
+    audioEnabled = !audioEnabled;
+    if (audioToggle) {
+      audioToggle.classList.toggle('bg-brand-500/15', audioEnabled);
+      audioToggle.classList.toggle('border-brand-500/40', audioEnabled);
+      audioToggle.classList.toggle('text-brand-300', audioEnabled);
+    }
+    if (audioStatusText) audioStatusText.textContent = audioEnabled ? 'ON' : 'OFF';
+    showToast(audioEnabled ? '🔊 Audio ON' : '🔇 Audio Muted');
+  }
+  // Left Arrow: Seek backward 1s
+  else if (e.code === 'ArrowLeft') {
+    e.preventDefault();
+    const totalDur = getTotalDuration();
+    currentTime = Math.max(0, currentTime - 1.0);
+    startTime = performance.now() - (currentTime * 1000);
+    render(currentTime);
+  }
+  // Right Arrow: Seek forward 1s
+  else if (e.code === 'ArrowRight') {
+    e.preventDefault();
+    const totalDur = getTotalDuration();
+    currentTime = Math.min(totalDur, currentTime + 1.0);
+    startTime = performance.now() - (currentTime * 1000);
+    render(currentTime);
+  }
+});
+
+// ==========================================
 // INITIALIZATION
 // ==========================================
 loadSceneFromHash();
@@ -2563,4 +2620,5 @@ loadSceneToForm(activeSceneIdx);
 updateCanvasSize();
 render(0);
 loop(performance.now());
+
 
