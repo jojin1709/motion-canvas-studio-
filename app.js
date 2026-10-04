@@ -2,14 +2,6 @@
 // FLUXFRAME STUDIO PRO — MASTER PROCEDURAL ENGINE
 // ==========================================
 
-// Initialize Lucide Icons
-function refreshIcons() {
-  if (window.lucide) {
-    window.lucide.createIcons();
-  }
-}
-refreshIcons();
-
 // DOM Elements
 const canvas = document.getElementById('renderCanvas');
 const ctx = canvas.getContext('2d');
@@ -30,7 +22,7 @@ const renderStatus = document.getElementById('renderStatus');
 const resolutionBadge = document.getElementById('resolutionBadge');
 const playBtn = document.getElementById('playBtn');
 const playBtnText = document.getElementById('playBtnText');
-const playIcon = document.getElementById('playIcon');
+const playIconWrap = document.getElementById('playIconWrap');
 const restartBtn = document.getElementById('restartBtn');
 const clearBtn = document.getElementById('clearBtn');
 const exportBtn = document.getElementById('exportBtn');
@@ -71,7 +63,6 @@ let raf;
 let isScrubbing = false;
 let userLogo = null;
 let customAudioElement = null;
-let customAudioBuffer = null;
 let audioEnabled = true;
 let audioCtx = null;
 
@@ -101,7 +92,7 @@ const shaders = {
       vec2 p = uv - 0.5;
       p.x *= r.x / r.y;
 
-      float time = t * 0.4;
+      float time = t * 0.45;
       vec2 q = vec2(
         p.x + sin(time * 0.7 + p.y * 2.2) * 0.28,
         p.y + cos(time * 0.6 + p.x * 2.4) * 0.28
@@ -376,9 +367,22 @@ function hexToRgb(h) {
   ];
 }
 
-// ==========================================
-// TOAST NOTIFICATION UTILITY
-// ==========================================
+// Cross-browser Rounded Rectangle Drawing Helper
+function drawRoundedRect(ctx, x, y, width, height, radius) {
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.lineTo(x + width - radius, y);
+  ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+  ctx.lineTo(x + width, y + height - radius);
+  ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+  ctx.lineTo(x + radius, y + height);
+  ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+  ctx.lineTo(x, y + radius);
+  ctx.quadraticCurveTo(x, y, x + radius, y);
+  ctx.closePath();
+}
+
+// Toast notification helper
 let toastTimeout;
 function showToast(msg) {
   toastMessage.textContent = msg;
@@ -533,21 +537,16 @@ function render(time) {
     const buf32 = new Uint32Array(imgData.data.buffer);
     for (let i = 0; i < buf32.length; i++) {
       if (Math.random() < 0.5) {
-        buf32[i] = 0x08ffffff; // subtle white speck
+        buf32[i] = 0x08ffffff;
       }
     }
-    const grainPattern = ctx.createPattern(
-      (() => {
-        const off = document.createElement('canvas');
-        off.width = grainSize;
-        off.height = grainSize;
-        off.getContext('2d').putImageData(imgData, 0, 0);
-        return off;
-      })(),
-      'repeat'
-    );
-    ctx.fillStyle = grainPattern;
-    ctx.globalAlpha = 0.25;
+    const offCanvas = document.createElement('canvas');
+    offCanvas.width = grainSize;
+    offCanvas.height = grainSize;
+    offCanvas.getContext('2d').putImageData(imgData, 0, 0);
+    
+    ctx.fillStyle = ctx.createPattern(offCanvas, 'repeat');
+    ctx.globalAlpha = 0.28;
     ctx.fillRect(0, 0, w, h);
     ctx.restore();
   }
@@ -555,7 +554,7 @@ function render(time) {
   // 4. Vignette Mask
   const vignette = ctx.createRadialGradient(w / 2, h / 2, Math.min(w, h) * 0.25, w / 2, h / 2, Math.max(w, h) * 0.72);
   vignette.addColorStop(0, 'rgba(0,0,0,0)');
-  vignette.addColorStop(1, 'rgba(0,0,0,0.52)');
+  vignette.addColorStop(1, 'rgba(0,0,0,0.55)');
   ctx.fillStyle = vignette;
   ctx.fillRect(0, 0, w, h);
 
@@ -627,33 +626,35 @@ function render(time) {
   const badgeText = (badgeInput.value || '').trim().toUpperCase();
   if (badgeText) {
     ctx.save();
-    ctx.globalAlpha = masterAlpha * 0.92;
-    ctx.font = `700 ${Math.max(11, 13 * scale)}px '${fontSelect.value}', sans-serif`;
+    ctx.globalAlpha = masterAlpha * 0.94;
+    ctx.font = `700 ${Math.max(12, 14 * scale)}px '${fontSelect.value}', sans-serif`;
     const textWidth = ctx.measureText(badgeText).width;
-    const pillW = textWidth + 28 * scale;
-    const pillH = 26 * scale;
+    const pillW = textWidth + 30 * scale;
+    const pillH = 28 * scale;
     
     let pillX = anchorX - pillW / 2;
     if (textAlign === 'left') pillX = anchorX;
     if (textAlign === 'right') pillX = anchorX - pillW;
 
-    const pillY = h * 0.38 + contentOffsetY + animOffsetY;
+    const pillY = h * 0.36 + contentOffsetY + animOffsetY;
 
-    ctx.fillStyle = 'rgba(10, 14, 28, 0.75)';
-    ctx.beginPath();
-    ctx.roundRect(pillX, pillY, pillW, pillH, 13 * scale);
+    // Glass pill background
+    ctx.fillStyle = 'rgba(10, 14, 28, 0.82)';
+    drawRoundedRect(ctx, pillX, pillY, pillW, pillH, 14 * scale);
     ctx.fill();
 
+    // Accent border
     ctx.strokeStyle = accent;
-    ctx.lineWidth = 1.5 * scale;
+    ctx.lineWidth = 1.8 * scale;
     ctx.stroke();
 
+    // Text inside pill
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillStyle = '#ffffff';
-    ctx.fillText(badgeText, pillX + pillW / 2, pillY + pillH / 2);
+    ctx.fillText(badgeText, pillX + pillW / 2, pillY + pillH / 2 + 1);
     ctx.restore();
-    contentOffsetY += pillH * 0.8;
+    contentOffsetY += pillH * 0.85;
   }
 
   // 8. Kinetic Typography Rendering
@@ -666,7 +667,7 @@ function render(time) {
   const sub = subtitleInput.value || '';
   const currentFont = fontSelect.value || 'Plus Jakarta Sans';
 
-  let mainSize = (currentStyle === 'editorial' ? 88 : 94) * scale;
+  let mainSize = (currentStyle === 'editorial' ? 88 : 96) * scale;
   if (w < h) mainSize *= 0.75;
 
   const centerY = h * 0.52 + contentOffsetY + animOffsetY;
@@ -739,12 +740,11 @@ function restart() {
 function updatePlayButtonUI(isPlaying) {
   if (isPlaying) {
     playBtnText.textContent = 'Pause';
-    playIcon.setAttribute('data-lucide', 'pause');
+    playIconWrap.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>';
   } else {
     playBtnText.textContent = 'Play';
-    playIcon.setAttribute('data-lucide', 'play');
+    playIconWrap.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>';
   }
-  refreshIcons();
 }
 
 function updateSettings() {
@@ -768,7 +768,15 @@ function generateSceneFromPrompt(prompt) {
   let title = 'BUILD THE FUTURE';
   let subtitle = 'The next generation platform is finally here';
 
-  if (p.includes('cyber') || p.includes('synth') || p.includes('gaming') || p.includes('crypto')) {
+  if (p.includes('cool') || p.includes('epic') || p.includes('hype') || p.includes('vibes') || p.includes('fire')) {
+    selectedStyle = 'solar';
+    selectedAccent = '#f59e0b';
+    selectedFont = 'Outfit';
+    selectedMotion = 'scale-pop';
+    badge = 'HOT DROP';
+    title = 'MAKE IT LEGENDARY';
+    subtitle = 'Pure adrenaline and unmatched creative power';
+  } else if (p.includes('cyber') || p.includes('synth') || p.includes('gaming') || p.includes('crypto') || p.includes('neon')) {
     selectedStyle = 'cyber';
     selectedAccent = '#ec4899';
     selectedFont = 'Space Grotesk';
@@ -776,7 +784,7 @@ function generateSceneFromPrompt(prompt) {
     badge = 'SYNTHWAVE 2026';
     title = 'NEON PROTOCOL';
     subtitle = 'Decentralized high-speed gaming infrastructure';
-  } else if (p.includes('solar') || p.includes('fire') || p.includes('keynote') || p.includes('summit')) {
+  } else if (p.includes('solar') || p.includes('keynote') || p.includes('summit') || p.includes('event')) {
     selectedStyle = 'solar';
     selectedAccent = '#f59e0b';
     selectedFont = 'Outfit';
@@ -784,15 +792,15 @@ function generateSceneFromPrompt(prompt) {
     badge = 'GLOBAL KEYNOTE';
     title = 'IGNITE REVOLUTION';
     subtitle = 'Streaming worldwide live on all platforms';
-  } else if (p.includes('aurora') || p.includes('space') || p.includes('nature') || p.includes('ai')) {
+  } else if (p.includes('aurora') || p.includes('space') || p.includes('nature') || p.includes('ai') || p.includes('cosmic')) {
     selectedStyle = 'aurora';
     selectedAccent = '#10b981';
     selectedFont = 'Plus Jakarta Sans';
     selectedMotion = 'kinetic-drift';
     badge = 'AUTONOMOUS AI';
-    title = 'QUANTUM INTELLIGENCE';
+    title = 'QUANTUM HORIZONS';
     subtitle = 'Self-evolving neural computing architecture';
-  } else if (p.includes('luxury') || p.includes('fashion') || p.includes('perfume') || p.includes('editorial')) {
+  } else if (p.includes('luxury') || p.includes('fashion') || p.includes('perfume') || p.includes('editorial') || p.includes('beauty')) {
     selectedStyle = 'prism';
     selectedAccent = '#a855f7';
     selectedFont = 'Cinzel';
@@ -800,7 +808,7 @@ function generateSceneFromPrompt(prompt) {
     badge = 'EDITION NO. 1';
     title = 'ETERNAL BEAUTY';
     subtitle = 'Crafted with timeless precision and care';
-  } else if (p.includes('warp') || p.includes('speed') || p.includes('fast') || p.includes('cloud')) {
+  } else if (p.includes('warp') || p.includes('speed') || p.includes('fast') || p.includes('cloud') || p.includes('infra')) {
     selectedStyle = 'warp';
     selectedAccent = '#06b6d4';
     selectedFont = 'JetBrains Mono';
@@ -808,7 +816,7 @@ function generateSceneFromPrompt(prompt) {
     badge = 'ULTRA SPEED';
     title = 'HYPER PERFORMANCE';
     subtitle = 'Sub-millisecond global execution engine';
-  } else if (p.includes('chrome') || p.includes('metal') || p.includes('car') || p.includes('hardware')) {
+  } else if (p.includes('chrome') || p.includes('metal') || p.includes('car') || p.includes('hardware') || p.includes('apple')) {
     selectedStyle = 'chrome';
     selectedAccent = '#06b6d4';
     selectedFont = 'Syne';
@@ -816,6 +824,14 @@ function generateSceneFromPrompt(prompt) {
     badge = 'FLAGSHIP HARDWARE';
     title = 'PRECISION CRAFT';
     subtitle = 'Aerospace grade materials forged for durability';
+  } else if (p.includes('dark') || p.includes('obsidian') || p.includes('podcast') || p.includes('audio')) {
+    selectedStyle = 'obsidian';
+    selectedAccent = '#6366f1';
+    selectedFont = 'Space Grotesk';
+    selectedMotion = 'fade-rise';
+    badge = 'EPISODE 42';
+    title = 'MIDNIGHT TALKS';
+    subtitle = 'Deep conversations with the pioneers of tech';
   }
 
   // Apply generated scene

@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#070913" />
-  <meta name="description" content="FluxFrame Studio Pro — Advanced GPU-accelerated motion video & graphic generator powered by WebGL, Web Audio, and Tailwind CSS." />
+  <meta name="description" content="FluxFrame Studio Pro — GPU-accelerated motion video generator powered by WebGL, Web Audio, and Tailwind CSS." />
   <title>FluxFrame Studio — Procedural Motion Video Generator</title>
 
   <!-- Google Fonts -->
@@ -44,25 +44,17 @@
               700: '#1e2646',
               600: '#2b365e',
             }
-          },
-          boxShadow: {
-            'glow-indigo': '0 0 25px -5px rgba(99, 102, 241, 0.45)',
-            'glow-cyan': '0 0 25px -5px rgba(6, 182, 212, 0.45)',
-            'glow-rose': '0 0 25px -5px rgba(244, 63, 94, 0.45)',
-            'glow-amber': '0 0 25px -5px rgba(245, 158, 11, 0.45)',
           }
         }
       }
     }
   </script>
 
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body class="bg-dark-950 text-slate-100 font-sans min-h-screen antialiased selection:bg-brand-500 selection:text-white">
 
-  <!-- BACKGROUND GLOW AMBIENCE -->
+  <!-- BACKGROUND AMBIENCE -->
   <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
     <div class="absolute -top-40 left-1/3 w-[650px] h-[650px] bg-brand-600/10 rounded-full blur-[140px]"></div>
     <div class="absolute -bottom-40 right-1/4 w-[650px] h-[650px] bg-cyan-600/10 rounded-full blur-[140px]"></div>
@@ -74,8 +66,8 @@
     <header class="h-16 px-4 sm:px-6 rounded-2xl bg-dark-900/80 backdrop-blur-xl border border-dark-700/60 shadow-2xl flex items-center justify-between gap-4">
       <!-- BRAND LOGO -->
       <div class="flex items-center gap-3">
-        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 via-indigo-500 to-cyan-400 flex items-center justify-center text-white shadow-glow-indigo">
-          <i data-lucide="layers" class="w-5 h-5"></i>
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 via-indigo-500 to-cyan-400 flex items-center justify-center text-white shadow-lg shadow-brand-500/30">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
         </div>
         <div class="flex items-center gap-2">
           <span class="font-outfit font-extrabold text-lg tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">FluxFrame</span>
@@ -83,34 +75,34 @@
         </div>
       </div>
 
-      <!-- AI PROMPT-TO-SCENE TRIGGER -->
-      <div class="hidden md:flex items-center gap-2 flex-1 max-w-md mx-4">
-        <div class="relative w-full">
-          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
-          <input type="text" id="aiPromptInput" placeholder="AI Prompt (e.g., 'Cyberpunk crypto event', 'Luxury watch launch')..." class="w-full bg-dark-950/90 border border-dark-700/80 rounded-xl pl-9 pr-20 py-1.5 text-xs text-white focus:border-brand-500 focus:outline-none placeholder:text-slate-500 transition" />
-          <button type="button" id="aiGenerateBtn" class="absolute right-1.5 top-1/2 -translate-y-1/2 px-2.5 py-0.5 rounded-lg bg-brand-500 hover:bg-brand-600 text-[11px] font-extrabold text-white transition active:scale-95">Generate</button>
+      <!-- AI PROMPT-TO-SCENE INPUT -->
+      <div class="hidden md:flex items-center gap-2 flex-1 max-w-lg mx-4">
+        <div class="relative w-full flex items-center">
+          <svg class="w-4 h-4 text-amber-400 absolute left-3 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+          <input type="text" id="aiPromptInput" placeholder="AI Prompt: 'Cyberpunk tournament', 'Luxury keynote', 'Make it cool'..." class="w-full bg-dark-950/90 border border-dark-700/80 rounded-xl pl-9 pr-24 py-1.5 text-xs text-white focus:border-brand-500 focus:outline-none placeholder:text-slate-500 transition" />
+          <button type="button" id="aiGenerateBtn" class="absolute right-1.5 px-3 py-1 rounded-lg bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-[11px] font-extrabold text-white transition active:scale-95 shadow-md">Generate ✨</button>
         </div>
       </div>
 
       <!-- ACTIONS -->
-      <div class="flex items-center gap-2 sm:gap-3">
+      <div class="flex items-center gap-2 sm:gap-2.5">
         <button id="shareLinkBtn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-dark-800/80 hover:bg-dark-700 border border-dark-700 text-slate-300 hover:text-white text-xs font-bold transition" title="Copy shareable link">
-          <i data-lucide="share-2" class="w-3.5 h-3.5 text-brand-400"></i>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
           <span class="hidden sm:inline">Share URL</span>
         </button>
 
         <button id="snapshotBtn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-dark-800/80 hover:bg-dark-700 border border-dark-700 text-slate-300 hover:text-white text-xs font-bold transition" title="Download High-Res 4K Frame">
-          <i data-lucide="camera" class="w-3.5 h-3.5 text-cyan-400"></i>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
           <span class="hidden sm:inline">Poster PNG</span>
         </button>
         
-        <button id="clearBtn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-dark-800/80 hover:bg-dark-700 border border-dark-700 text-slate-300 hover:text-white text-xs font-bold transition">
-          <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+        <button id="clearBtn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-dark-800/80 hover:bg-dark-700 border border-dark-700 text-slate-300 hover:text-white text-xs font-bold transition" title="Reset all settings">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
           <span class="hidden sm:inline">Reset</span>
         </button>
 
         <button id="exportBtn" class="flex items-center gap-2 px-5 py-2 rounded-xl bg-white hover:bg-slate-100 text-dark-950 text-xs font-extrabold shadow-lg shadow-white/10 transition active:scale-95">
-          <i data-lucide="download" class="w-4 h-4"></i>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           <span id="exportBtnText">Export Video</span>
         </button>
       </div>
@@ -129,7 +121,7 @@
           </div>
           <!-- Quick Preset Dropdown -->
           <div class="flex items-center gap-1.5">
-            <select id="quickPresetSelect" class="bg-dark-950 border border-dark-700 rounded-lg px-2.5 py-1 text-[11px] font-bold text-brand-300 focus:outline-none">
+            <select id="quickPresetSelect" class="bg-dark-950 border border-dark-700 rounded-lg px-2.5 py-1 text-[11px] font-bold text-brand-300 focus:outline-none cursor-pointer">
               <option value="" disabled selected>⚡ Quick Presets</option>
               <option value="launch">🚀 Product Launch</option>
               <option value="solar">🔥 Solar Keynote</option>
@@ -144,7 +136,10 @@
         <!-- 8 VISUAL SHADERS -->
         <div class="flex flex-col gap-2.5">
           <label class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
-            <span class="flex items-center gap-1.5"><i data-lucide="palette" class="w-3.5 h-3.5 text-brand-400"></i> Visual Shader Style</span>
+            <span class="flex items-center gap-1.5">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-brand-400"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.563-2.512 5.563-5.563C22 6.5 17.5 2 12 2Z"/></svg>
+              Visual Shader System
+            </span>
             <span class="text-[10px] text-brand-400 font-bold">8 Styles</span>
           </label>
           <div class="grid grid-cols-2 gap-2" id="styleGrid">
@@ -261,19 +256,19 @@
         <div class="grid grid-cols-3 gap-2.5">
           <div>
             <label class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1.5">Font</label>
-            <select id="fontSelect" class="w-full bg-dark-950/80 border border-dark-700/80 rounded-xl px-2.5 py-2 text-xs font-semibold text-white focus:border-brand-500 focus:outline-none transition">
-              <option value="Plus Jakarta Sans" selected>Plus Jakarta Sans</option>
+            <select id="fontSelect" class="w-full bg-dark-950/80 border border-dark-700/80 rounded-xl px-2.5 py-2 text-xs font-semibold text-white focus:border-brand-500 focus:outline-none transition cursor-pointer">
+              <option value="Plus Jakarta Sans" selected>Plus Jakarta</option>
               <option value="Space Grotesk">Space Grotesk</option>
               <option value="Outfit">Outfit</option>
               <option value="Syne">Syne</option>
-              <option value="Cinzel">Cinzel</option>
+              <option value="Cinzel">Cinzel Serif</option>
               <option value="JetBrains Mono">JetBrains Mono</option>
             </select>
           </div>
 
           <div>
             <label class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1.5">Motion</label>
-            <select id="motionSelect" class="w-full bg-dark-950/80 border border-dark-700/80 rounded-xl px-2.5 py-2 text-xs font-semibold text-white focus:border-brand-500 focus:outline-none transition">
+            <select id="motionSelect" class="w-full bg-dark-950/80 border border-dark-700/80 rounded-xl px-2.5 py-2 text-xs font-semibold text-white focus:border-brand-500 focus:outline-none transition cursor-pointer">
               <option value="fade-rise" selected>Rise & Fade</option>
               <option value="scale-pop">Scale Pop</option>
               <option value="kinetic-drift">Drift Zoom</option>
@@ -284,9 +279,15 @@
           <div>
             <label class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1.5">Align</label>
             <div class="grid grid-cols-3 bg-dark-950/80 p-1 rounded-xl border border-dark-700/80" id="alignControl">
-              <button type="button" class="seg-btn" data-align="left" title="Left Align"><i data-lucide="align-left" class="w-3.5 h-3.5 mx-auto"></i></button>
-              <button type="button" class="seg-btn active" data-align="center" title="Center Align"><i data-lucide="align-center" class="w-3.5 h-3.5 mx-auto"></i></button>
-              <button type="button" class="seg-btn" data-align="right" title="Right Align"><i data-lucide="align-right" class="w-3.5 h-3.5 mx-auto"></i></button>
+              <button type="button" class="seg-btn flex items-center justify-center py-1" data-align="left" title="Left Align">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="21" y1="6" x2="3" y2="6"/><line x1="15" y1="12" x2="3" y2="12"/><line x1="17" y1="18" x2="3" y2="18"/></svg>
+              </button>
+              <button type="button" class="seg-btn active flex items-center justify-center py-1" data-align="center" title="Center Align">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="21" y1="6" x2="3" y2="6"/><line x1="19" y1="12" x2="5" y2="12"/><line x1="21" y1="18" x2="3" y2="18"/></svg>
+              </button>
+              <button type="button" class="seg-btn flex items-center justify-center py-1" data-align="right" title="Right Align">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="12" x2="9" y2="12"/><line x1="21" y1="18" x2="7" y2="18"/></svg>
+              </button>
             </div>
             <select id="alignSelect" class="sr-only" aria-label="Text Align Select">
               <option value="center" selected>Center</option>
@@ -339,13 +340,13 @@
             <input type="range" id="speedSlider" min="0.3" max="2.5" step="0.1" value="1.0" class="w-full accent-brand-500 cursor-pointer h-1.5 bg-dark-800 rounded-lg" />
           </div>
 
-          <div class="flex items-center justify-between pt-2">
+          <div class="flex items-center justify-between pt-1">
             <div>
-              <span class="text-xs font-bold text-slate-300 block">Film Grain Overlay</span>
-              <span class="text-[10px] text-slate-500">Cinematic noise</span>
+              <span class="text-xs font-bold text-slate-300 block">Film Grain</span>
+              <span class="text-[10px] text-slate-500">Noise overlay</span>
             </div>
-            <button type="button" id="grainToggle" class="w-10 h-5 rounded-full bg-dark-700 relative transition-colors focus:outline-none" aria-pressed="false">
-              <span class="w-4 h-4 rounded-full bg-white absolute top-0.5 left-0.5 transition-transform" id="grainToggleKnob"></span>
+            <button type="button" id="grainToggle" class="w-10 h-5 rounded-full bg-dark-700 relative transition-colors focus:outline-none cursor-pointer" aria-pressed="false">
+              <span class="w-4 h-4 rounded-full bg-white absolute top-0.5 left-0.5 transition-transform duration-200" id="grainToggleKnob"></span>
             </button>
           </div>
         </div>
@@ -374,7 +375,7 @@
         <div class="flex flex-col gap-2">
           <div class="flex items-center justify-between">
             <label class="text-xs font-bold uppercase tracking-wider text-slate-400">Logo & Position</label>
-            <select id="logoPosSelect" class="bg-dark-950 text-slate-300 text-[11px] font-semibold border border-dark-700 rounded-lg px-2 py-0.5 focus:outline-none">
+            <select id="logoPosSelect" class="bg-dark-950 text-slate-300 text-[11px] font-semibold border border-dark-700 rounded-lg px-2 py-0.5 focus:outline-none cursor-pointer">
               <option value="above-title" selected>Above Title</option>
               <option value="top-left">Top-Left Corner</option>
               <option value="top-center">Top-Center</option>
@@ -383,7 +384,7 @@
           </div>
           <div class="flex items-center gap-2">
             <label for="logoUpload" class="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-dark-950/80 border border-dashed border-dark-700 hover:border-brand-500/70 text-slate-400 hover:text-white text-xs font-semibold cursor-pointer transition">
-              <i data-lucide="upload-cloud" class="w-4 h-4 text-brand-400"></i>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-brand-400"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
               <span id="logoFileName">Upload PNG / SVG Logo</span>
             </label>
             <input type="file" id="logoUpload" accept="image/png,image/svg+xml,image/webp,image/jpeg" class="sr-only" />
@@ -396,20 +397,21 @@
           <div class="flex items-center justify-between">
             <label class="text-xs font-bold uppercase tracking-wider text-slate-400">Audio Soundtrack</label>
             <label for="customAudioUpload" class="text-[11px] text-brand-400 hover:text-brand-300 font-bold cursor-pointer flex items-center gap-1">
-              <i data-lucide="music" class="w-3 h-3"></i> <span id="customAudioLabel">Upload MP3/WAV</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+              <span id="customAudioLabel">Upload MP3/WAV</span>
             </label>
             <input type="file" id="customAudioUpload" accept="audio/mp3,audio/wav,audio/aac,audio/m4a,audio/ogg" class="sr-only" />
           </div>
           <div class="flex items-center gap-2">
-            <select id="audioSoundSelect" class="flex-1 bg-dark-950/80 border border-dark-700/80 rounded-xl px-3 py-2 text-xs font-semibold text-white focus:border-brand-500 focus:outline-none transition">
+            <select id="audioSoundSelect" class="flex-1 bg-dark-950/80 border border-dark-700/80 rounded-xl px-3 py-2 text-xs font-semibold text-white focus:border-brand-500 focus:outline-none transition cursor-pointer">
               <option value="ambient">Harmonic Ambient Pad (Warm C Maj9)</option>
               <option value="solar">Solar Energy Pulse (Golden Frequency)</option>
               <option value="cosmic">Cosmic Space Resonance (Deep Filter)</option>
               <option value="lofi">Lo-Fi Tape Drone (Mellow Warmth)</option>
               <option value="custom" id="customAudioOption" disabled>Custom Uploaded Audio</option>
             </select>
-            <button type="button" id="audioToggle" class="px-3 py-2 rounded-xl bg-brand-500/15 border border-brand-500/40 text-brand-300 hover:bg-brand-500/25 flex items-center gap-1.5 text-xs font-bold transition" title="Toggle sound mute/unmute">
-              <i data-lucide="volume-2" class="w-4 h-4"></i>
+            <button type="button" id="audioToggle" class="px-3 py-2 rounded-xl bg-brand-500/15 border border-brand-500/40 text-brand-300 hover:bg-brand-500/25 flex items-center gap-1.5 text-xs font-bold transition cursor-pointer" title="Toggle sound mute/unmute">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
               <span id="audioStatusText">ON</span>
             </button>
           </div>
@@ -429,12 +431,14 @@
           
           <div class="flex items-center gap-2">
             <span id="timeLabel" class="text-xs font-mono font-bold text-brand-400 bg-brand-500/10 border border-brand-500/20 px-2.5 py-1 rounded-lg">00:00 / 00:05</span>
-            <button id="playBtn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-dark-800 border border-dark-700 text-xs font-bold text-white hover:bg-dark-700 transition">
-              <i data-lucide="pause" class="w-3.5 h-3.5" id="playIcon"></i>
+            <button id="playBtn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-dark-800 border border-dark-700 text-xs font-bold text-white hover:bg-dark-700 transition cursor-pointer">
+              <span id="playIconWrap">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+              </span>
               <span id="playBtnText">Pause</span>
             </button>
-            <button id="restartBtn" class="p-1.5 rounded-lg bg-dark-800 border border-dark-700 text-slate-300 hover:text-white hover:bg-dark-700 transition" title="Restart">
-              <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+            <button id="restartBtn" class="p-1.5 rounded-lg bg-dark-800 border border-dark-700 text-slate-300 hover:text-white hover:bg-dark-700 transition cursor-pointer" title="Restart">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
             </button>
           </div>
         </div>
@@ -457,9 +461,15 @@
         <!-- FOOTER STATUS & TOAST NOTIFICATION -->
         <div class="flex items-center justify-between text-xs pt-1 border-t border-dark-700/50">
           <div class="flex items-center gap-3 text-slate-400 font-medium">
-            <span class="flex items-center gap-1"><i data-lucide="cpu" class="w-3.5 h-3.5 text-brand-400"></i> 60 FPS WebGL 2.0</span>
+            <span class="flex items-center gap-1">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-brand-400"><rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9" rx="1"/></svg>
+              60 FPS WebGL 2.0
+            </span>
             <span>•</span>
-            <span class="flex items-center gap-1"><i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-400"></i> Zero Cloud Server</span>
+            <span class="flex items-center gap-1">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-emerald-400"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Zero Cloud Server
+            </span>
           </div>
           <div class="font-bold text-emerald-400 flex items-center gap-1.5" id="renderStatus">
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Ready to render
@@ -472,7 +482,7 @@
 
   <!-- TOAST NOTIFICATION (POPUP) -->
   <div id="toast" class="fixed bottom-6 right-6 z-50 px-4 py-2.5 rounded-xl bg-dark-900 border border-brand-500/50 text-white text-xs font-bold shadow-2xl shadow-brand-500/20 flex items-center gap-2 transform translate-y-20 opacity-0 pointer-events-none transition-all duration-300">
-    <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="text-emerald-400"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
     <span id="toastMessage">Link copied to clipboard!</span>
   </div>
 
