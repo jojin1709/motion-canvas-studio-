@@ -872,6 +872,7 @@ function applyParsedScene(parsed, prompt) {
 
 function generateSceneFromPrompt(prompt) {
   const p = prompt.toLowerCase();
+  const hasWord = (word) => new RegExp('\\b' + word + '\\b', 'i').test(prompt);
 
   let selectedStyle = 'silk';
   let selectedAccent = '#6366f1';
@@ -879,9 +880,20 @@ function generateSceneFromPrompt(prompt) {
   let selectedMotion = 'fade-rise';
   let badge = 'ANNOUNCEMENT';
   let title = 'BUILD THE FUTURE';
-  let subtitle = 'The next generation platform is finally here';
+  let subtitle = 'High-fidelity procedural motion graphics in real-time';
 
-  if (p.includes('water') || p.includes('fluid') || p.includes('liquid') || p.includes('ocean') || p.includes('sea') || p.includes('aqua') || p.includes('wave') || p.includes('flow')) {
+  // 1. Rain / Storm / Weather / Mood / Lofi
+  if (hasWord('rain') || hasWord('rainy') || hasWord('storm') || hasWord('stormy') || hasWord('thunder') || hasWord('cloud') || hasWord('clouds') || hasWord('weather') || hasWord('drizzle') || hasWord('lofi') || hasWord('chill') || hasWord('relax')) {
+    selectedStyle = 'obsidian';
+    selectedAccent = '#38bdf8';
+    selectedFont = 'Plus Jakarta Sans';
+    selectedMotion = 'fade-rise';
+    badge = 'RAINY AESTHETIC';
+    title = 'MIDNIGHT RAIN';
+    subtitle = 'Calming raindrops, atmospheric ambience and cinematic lo-fi waves';
+  } 
+  // 2. Water / Ocean / Aquatic / Fluid
+  else if (hasWord('water') || hasWord('fluid') || hasWord('liquid') || hasWord('ocean') || hasWord('sea') || hasWord('aqua') || hasWord('wave') || hasWord('waves') || hasWord('flow') || hasWord('river')) {
     selectedStyle = 'silk';
     selectedAccent = '#06b6d4';
     selectedFont = 'Outfit';
@@ -889,7 +901,9 @@ function generateSceneFromPrompt(prompt) {
     badge = 'AQUATIC MOTION';
     title = 'LIQUID WAVES';
     subtitle = 'Smooth procedural fluid simulation and crystalline ripples';
-  } else if (p.includes('dance') || p.includes('party') || p.includes('festival') || p.includes('music') || p.includes('club') || p.includes('dj')) {
+  } 
+  // 3. Dance / Music / Festival / DJ
+  else if (hasWord('dance') || hasWord('dancing') || hasWord('party') || hasWord('festival') || hasWord('music') || hasWord('club') || hasWord('dj') || hasWord('beats') || hasWord('bass')) {
     selectedStyle = 'cyber';
     selectedAccent = '#ec4899';
     selectedFont = 'Syne';
@@ -897,7 +911,9 @@ function generateSceneFromPrompt(prompt) {
     badge = 'LIVE FESTIVAL';
     title = 'KINETIC BEATS';
     subtitle = 'Electrifying soundstage and rhythmic visual pulses';
-  } else if (p.includes('cool') || p.includes('epic') || p.includes('hype') || p.includes('vibes') || p.includes('fire')) {
+  } 
+  // 4. Hype / Fire / Epic / Energy
+  else if (hasWord('cool') || hasWord('epic') || hasWord('hype') || hasWord('vibes') || hasWord('fire') || hasWord('energy') || hasWord('flame') || hasWord('blaze')) {
     selectedStyle = 'solar';
     selectedAccent = '#f59e0b';
     selectedFont = 'Outfit';
@@ -905,7 +921,9 @@ function generateSceneFromPrompt(prompt) {
     badge = 'HOT DROP';
     title = 'MAKE IT LEGENDARY';
     subtitle = 'Pure adrenaline and unmatched creative power';
-  } else if (p.includes('cyber') || p.includes('synth') || p.includes('gaming') || p.includes('crypto') || p.includes('neon')) {
+  } 
+  // 5. Cyberpunk / Synthwave / Gaming / Crypto
+  else if (hasWord('cyber') || hasWord('cyberpunk') || hasWord('synth') || hasWord('synthwave') || hasWord('gaming') || hasWord('game') || hasWord('crypto') || hasWord('neon') || hasWord('arcade')) {
     selectedStyle = 'cyber';
     selectedAccent = '#ec4899';
     selectedFont = 'Space Grotesk';
@@ -913,7 +931,9 @@ function generateSceneFromPrompt(prompt) {
     badge = 'SYNTHWAVE 2026';
     title = 'NEON PROTOCOL';
     subtitle = 'Decentralized high-speed gaming infrastructure';
-  } else if (p.includes('solar') || p.includes('keynote') || p.includes('summit') || p.includes('event')) {
+  } 
+  // 6. Solar / Keynote / Summit / Launch
+  else if (hasWord('solar') || hasWord('sun') || hasWord('keynote') || hasWord('summit') || hasWord('event') || hasWord('conference') || hasWord('launch')) {
     selectedStyle = 'solar';
     selectedAccent = '#f59e0b';
     selectedFont = 'Outfit';
@@ -921,31 +941,39 @@ function generateSceneFromPrompt(prompt) {
     badge = 'GLOBAL KEYNOTE';
     title = 'IGNITE REVOLUTION';
     subtitle = 'Streaming worldwide live on all platforms';
-  } else if (p.includes('aurora') || p.includes('space') || p.includes('nature') || p.includes('ai') || p.includes('cosmic')) {
+  } 
+  // 7. Aurora / Space / Quantum / AI (Standalone word only!)
+  else if (hasWord('aurora') || hasWord('space') || hasWord('galaxy') || hasWord('cosmos') || hasWord('cosmic') || hasWord('ai') || hasWord('quantum') || hasWord('neural')) {
     selectedStyle = 'aurora';
     selectedAccent = '#10b981';
     selectedFont = 'Plus Jakarta Sans';
     selectedMotion = 'kinetic-drift';
-    badge = 'AUTONOMOUS AI';
-    title = 'QUANTUM HORIZONS';
-    subtitle = 'Self-evolving neural computing architecture';
-  } else if (p.includes('luxury') || p.includes('fashion') || p.includes('perfume') || p.includes('editorial') || p.includes('beauty')) {
+    badge = 'QUANTUM CORE';
+    title = 'COSMIC HORIZONS';
+    subtitle = 'Autonomous neural computing and galactic deep space';
+  } 
+  // 8. Luxury / Fashion / Editorial / Beauty
+  else if (hasWord('luxury') || hasWord('fashion') || hasWord('perfume') || hasWord('editorial') || hasWord('beauty') || hasWord('gold') || hasWord('jewel') || hasWord('model')) {
     selectedStyle = 'prism';
     selectedAccent = '#a855f7';
     selectedFont = 'Cinzel';
     selectedMotion = 'fade-rise';
     badge = 'EDITION NO. 1';
     title = 'ETERNAL BEAUTY';
-    subtitle = 'Crafted with timeless precision and care';
-  } else if (p.includes('warp') || p.includes('speed') || p.includes('fast') || p.includes('cloud') || p.includes('infra')) {
+    subtitle = 'Crafted with timeless precision and luxury aesthetics';
+  } 
+  // 9. Warp / Speed / Fast / Infrastructure
+  else if (hasWord('warp') || hasWord('speed') || hasWord('fast') || hasWord('turbo') || hasWord('cloud') || hasWord('infra') || hasWord('network') || hasWord('server')) {
     selectedStyle = 'warp';
     selectedAccent = '#06b6d4';
     selectedFont = 'JetBrains Mono';
     selectedMotion = 'scale-pop';
     badge = 'ULTRA SPEED';
     title = 'HYPER PERFORMANCE';
-    subtitle = 'Sub-millisecond global execution engine';
-  } else if (p.includes('chrome') || p.includes('metal') || p.includes('car') || p.includes('hardware') || p.includes('apple')) {
+    subtitle = 'Sub-millisecond global execution and high-throughput network';
+  } 
+  // 10. Chrome / Metal / Hardware / Industrial
+  else if (hasWord('chrome') || hasWord('metal') || hasWord('metallic') || hasWord('car') || hasWord('hardware') || hasWord('engine') || hasWord('titanium')) {
     selectedStyle = 'chrome';
     selectedAccent = '#06b6d4';
     selectedFont = 'Syne';
@@ -953,20 +981,23 @@ function generateSceneFromPrompt(prompt) {
     badge = 'FLAGSHIP HARDWARE';
     title = 'PRECISION CRAFT';
     subtitle = 'Aerospace grade materials forged for durability';
-  } else if (p.includes('dark') || p.includes('obsidian') || p.includes('podcast') || p.includes('audio')) {
+  } 
+  // 11. Obsidian / Dark / Podcast / Audio / Night
+  else if (hasWord('dark') || hasWord('obsidian') || hasWord('black') || hasWord('podcast') || hasWord('audio') || hasWord('sound') || hasWord('voice')) {
     selectedStyle = 'obsidian';
     selectedAccent = '#6366f1';
     selectedFont = 'Space Grotesk';
     selectedMotion = 'fade-rise';
     badge = 'EPISODE 42';
     title = 'MIDNIGHT TALKS';
-    subtitle = 'Deep conversations with the pioneers of tech';
-  } else {
-    // Dynamic fallback extracted from words in the prompt!
-    const cleanWords = prompt.replace(/[^\w\s]/gi, '').trim().split(/\s+/);
-    if (cleanWords.length > 0 && cleanWords[0].length > 0) {
+    subtitle = 'Deep conversations with the pioneers of modern technology';
+  } 
+  else {
+    // Dynamic subject extraction directly from user's custom prompt!
+    const cleanWords = prompt.replace(/[^\w\s]/gi, '').trim().split(/\s+/).filter(w => !['make', 'it', 'a', 'the', 'and', 'for', 'in', 'on', 'with', 'to', 'style', 'video'].includes(w.toLowerCase()));
+    if (cleanWords.length > 0) {
       title = cleanWords.slice(0, 4).join(' ').toUpperCase();
-      badge = cleanWords[0].toUpperCase() + ' EDITION';
+      badge = (cleanWords[0] || 'CUSTOM').toUpperCase() + ' EDITION';
       subtitle = `High-impact dynamic scene crafted for ${prompt}`;
     }
   }
