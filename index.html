@@ -64,6 +64,9 @@
     }
   </script>
 
+  <!-- GIF Generator CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/gifshot@0.4.5/dist/gifshot.min.js"></script>
+
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body class="bg-dark-950 text-slate-100 font-sans min-h-screen antialiased selection:bg-brand-500 selection:text-white">
@@ -165,10 +168,18 @@
           <span class="hidden sm:inline">Reset</span>
         </button>
 
-        <button id="exportBtn" class="flex items-center gap-2 px-5 py-2 rounded-xl bg-white hover:bg-slate-100 text-dark-950 text-xs font-extrabold shadow-lg shadow-white/10 transition active:scale-95">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          <span id="exportBtnText">Export Video</span>
-        </button>
+        <!-- Multi-format Export Controls -->
+        <div class="flex items-center gap-1 bg-dark-950 p-0.5 rounded-xl border border-dark-700">
+          <select id="exportFormatSelect" class="bg-transparent text-slate-200 rounded-lg px-2 py-1 text-xs font-bold focus:outline-none cursor-pointer border-none">
+            <option value="webm" selected>🎬 WebM</option>
+            <option value="mp4">📱 MP4</option>
+            <option value="gif">🎞️ GIF</option>
+          </select>
+          <button id="exportBtn" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-white hover:bg-slate-100 text-dark-950 text-xs font-extrabold shadow-md transition active:scale-95">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span id="exportBtnText">Export</span>
+          </button>
+        </div>
       </div>
     </header>
 
@@ -181,19 +192,43 @@
         <div class="flex items-center justify-between pb-3 border-b border-dark-700/50">
           <div>
             <h2 class="text-base font-extrabold tracking-tight text-white font-outfit">Scene Designer</h2>
-            <p class="text-xs text-slate-400">8 Visual Shaders, Cloudflare AI & Audio Engine</p>
+            <p class="text-xs text-slate-400">8 Shaders, Storyboard & AI Engine</p>
           </div>
           <!-- Quick Preset Dropdown -->
           <div class="flex items-center gap-1.5">
             <select id="quickPresetSelect" class="bg-dark-950 border border-dark-700 rounded-lg px-2.5 py-1 text-[11px] font-bold text-brand-300 focus:outline-none cursor-pointer">
-              <option value="" disabled selected>⚡ Quick Presets</option>
-              <option value="launch">🚀 Product Launch</option>
-              <option value="solar">🔥 Solar Keynote</option>
-              <option value="cyber">⚡ Cyberpunk Synth</option>
-              <option value="aurora">🌌 Cosmic Aurora</option>
-              <option value="reels">📱 Story / Reel (9:16)</option>
-              <option value="podcast">🎙️ Podcast Episode</option>
+              <option value="" disabled selected>⚡ Studio Templates</option>
+              <option value="reels">📱 TikTok / Reels Hook (9:16)</option>
+              <option value="youtube">🎬 YouTube Cinematic Intro (16:9)</option>
+              <option value="spotify">🎵 Spotify Canvas Loop (9:16)</option>
+              <option value="launch">🚀 Tech Product Launch (16:9)</option>
+              <option value="rain">🌧️ Midnight Rain Lo-Fi (16:9)</option>
+              <option value="solar">🔥 Solar Keynote Summit (16:9)</option>
+              <option value="cyber">⚡ Cyberpunk Synthwave (16:9)</option>
+              <option value="luxury">💎 Luxury Brand Editorial (1:1)</option>
+              <option value="podcast">🎙️ Dark Podcast Clip (1:1)</option>
             </select>
+          </div>
+        </div>
+
+        <!-- 1. MULTI-SCENE STORYBOARD SEQUENCE BUILDER -->
+        <div class="flex flex-col gap-2 p-3 bg-dark-950/60 rounded-2xl border border-dark-700/70">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-brand-400"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 3v18"/><path d="M3 7.5h4"/><path d="M3 12h18"/><path d="M3 16.5h4"/><path d="M17 3v18"/><path d="M17 7.5h4"/><path d="M17 16.5h4"/></svg>
+              Storyboard Sequence
+            </span>
+            <div class="flex items-center gap-1.5">
+              <button type="button" id="addSceneBtn" class="px-2.5 py-1 rounded-lg bg-brand-500/20 hover:bg-brand-500/30 text-brand-300 text-[11px] font-bold border border-brand-500/40 flex items-center gap-1 transition cursor-pointer active:scale-95">
+                <span>+ Add Scene</span>
+              </button>
+              <button type="button" id="deleteSceneBtn" class="px-2 py-1 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-[11px] font-bold border border-rose-500/40 transition cursor-pointer active:scale-95" title="Delete current scene">
+                ✕ Delete
+              </button>
+            </div>
+          </div>
+          <div class="flex items-center gap-1.5 overflow-x-auto custom-scrollbar pt-1 pb-0.5" id="sceneTabsWrap">
+            <!-- Scene Tabs populated dynamically by JS -->
           </div>
         </div>
 
@@ -313,6 +348,79 @@
           <div>
             <label class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1.5">Subtitle / Tagline</label>
             <input type="text" id="subtitleInput" maxlength="70" value="High-fidelity procedural motion graphics in real-time" placeholder="Enter subtitle..." class="w-full bg-dark-950/80 border border-dark-700/80 rounded-xl px-3.5 py-2 text-xs font-medium text-slate-300 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500/50 transition placeholder:text-slate-600" />
+          </div>
+        </div>
+
+        <!-- 2. GRADIENT HEADLINES & TEXT GLOW FX -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1.5">Headline Gradient FX</label>
+            <select id="textGradientSelect" class="w-full bg-dark-950/80 border border-dark-700/80 rounded-xl px-2.5 py-2 text-xs font-semibold text-white focus:border-brand-500 focus:outline-none transition cursor-pointer">
+              <option value="solid" selected>Solid Accent Lighting</option>
+              <option value="sunset">🌅 Sunset Flame (Gold ➔ Coral)</option>
+              <option value="cyber">⚡ Cyber Neon (Pink ➔ Violet)</option>
+              <option value="aqua">🌊 Deep Aqua (Cyan ➔ Indigo)</option>
+              <option value="chrome">💿 Liquid Chrome (Silver ➔ White)</option>
+              <option value="rainbow">🌈 Prism Hologram (Multi-stop)</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1.5">Text Glow Intensity</label>
+            <select id="textGlowSelect" class="w-full bg-dark-950/80 border border-dark-700/80 rounded-xl px-2.5 py-2 text-xs font-semibold text-white focus:border-brand-500 focus:outline-none transition cursor-pointer">
+              <option value="12">Subtle Glow (12px)</option>
+              <option value="26" selected>Vibrant Glow (26px)</option>
+              <option value="48">Hyper Beam Glow (48px)</option>
+              <option value="0">Clean (No Glow)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 3. ATMOSPHERIC PARTICLES & CTA BADGE -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1.5">Atmospheric Particles</label>
+            <select id="particleSelect" class="w-full bg-dark-950/80 border border-dark-700/80 rounded-xl px-2.5 py-2 text-xs font-semibold text-white focus:border-brand-500 focus:outline-none transition cursor-pointer">
+              <option value="none" selected>None (Clean)</option>
+              <option value="rain">🌧️ Falling Raindrops & Mist</option>
+              <option value="dust">✨ Floating Cosmic Dust</option>
+              <option value="sparks">⚡ Cyber Glitch Sparks</option>
+              <option value="stars">🌌 Starfield Warp Speed</option>
+              <option value="confetti">🎉 Celebration Confetti</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1.5">Call-To-Action (CTA)</label>
+            <select id="ctaSelect" class="w-full bg-dark-950/80 border border-dark-700/80 rounded-xl px-2.5 py-2 text-xs font-semibold text-white focus:border-brand-500 focus:outline-none transition cursor-pointer">
+              <option value="none" selected>None</option>
+              <option value="download">📲 Download App</option>
+              <option value="bio">🔗 Link in Bio</option>
+              <option value="shop">🔥 Shop Now (50% OFF)</option>
+              <option value="subscribe">▶️ Subscribe & Follow</option>
+              <option value="register">🚀 Register Free</option>
+              <option value="swipe">👆 Swipe Up</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 4. AI VOICEOVER (TTS) NARRATOR -->
+        <div class="flex items-center justify-between p-3 bg-dark-950/60 rounded-2xl border border-dark-700/70">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 flex-shrink-0">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+            </div>
+            <div>
+              <span class="text-xs font-bold text-slate-200 block">AI Voiceover Narrator</span>
+              <span class="text-[10px] text-slate-400">Speaks scene headline in real-time</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <select id="voiceGenderSelect" class="bg-dark-950 text-slate-300 text-[11px] font-semibold border border-dark-700 rounded-lg px-2 py-1 focus:outline-none cursor-pointer">
+              <option value="female" selected>✨ Cinematic Voice</option>
+              <option value="male">🎙️ Studio Voice</option>
+            </select>
+            <button type="button" id="voiceToggle" class="px-2.5 py-1 rounded-lg bg-dark-800 border border-dark-700 text-slate-400 hover:text-white text-xs font-bold transition cursor-pointer">
+              <span id="voiceStatusText">OFF</span>
+            </button>
           </div>
         </div>
 
