@@ -881,7 +881,23 @@ function generateSceneFromPrompt(prompt) {
   let title = 'BUILD THE FUTURE';
   let subtitle = 'The next generation platform is finally here';
 
-  if (p.includes('cool') || p.includes('epic') || p.includes('hype') || p.includes('vibes') || p.includes('fire')) {
+  if (p.includes('water') || p.includes('fluid') || p.includes('liquid') || p.includes('ocean') || p.includes('sea') || p.includes('aqua') || p.includes('wave') || p.includes('flow')) {
+    selectedStyle = 'silk';
+    selectedAccent = '#06b6d4';
+    selectedFont = 'Outfit';
+    selectedMotion = 'kinetic-drift';
+    badge = 'AQUATIC MOTION';
+    title = 'LIQUID WAVES';
+    subtitle = 'Smooth procedural fluid simulation and crystalline ripples';
+  } else if (p.includes('dance') || p.includes('party') || p.includes('festival') || p.includes('music') || p.includes('club') || p.includes('dj')) {
+    selectedStyle = 'cyber';
+    selectedAccent = '#ec4899';
+    selectedFont = 'Syne';
+    selectedMotion = 'glitch-flash';
+    badge = 'LIVE FESTIVAL';
+    title = 'KINETIC BEATS';
+    subtitle = 'Electrifying soundstage and rhythmic visual pulses';
+  } else if (p.includes('cool') || p.includes('epic') || p.includes('hype') || p.includes('vibes') || p.includes('fire')) {
     selectedStyle = 'solar';
     selectedAccent = '#f59e0b';
     selectedFont = 'Outfit';
@@ -945,6 +961,14 @@ function generateSceneFromPrompt(prompt) {
     badge = 'EPISODE 42';
     title = 'MIDNIGHT TALKS';
     subtitle = 'Deep conversations with the pioneers of tech';
+  } else {
+    // Dynamic fallback extracted from words in the prompt!
+    const cleanWords = prompt.replace(/[^\w\s]/gi, '').trim().split(/\s+/);
+    if (cleanWords.length > 0 && cleanWords[0].length > 0) {
+      title = cleanWords.slice(0, 4).join(' ').toUpperCase();
+      badge = cleanWords[0].toUpperCase() + ' EDITION';
+      subtitle = `High-impact dynamic scene crafted for ${prompt}`;
+    }
   }
 
   applyParsedScene({
