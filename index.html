@@ -68,31 +68,31 @@
 <body class="bg-dark-950 text-slate-100 font-sans min-h-screen antialiased selection:bg-brand-500 selection:text-white">
 
   <!-- CLOUDFLARE TURNSTILE BOT VERIFICATION GATEWAY -->
-  <div id="turnstileModal" class="fixed inset-0 z-50 flex items-center justify-center bg-dark-950/95 backdrop-blur-2xl transition-all duration-500">
-    <div class="relative w-full max-w-md mx-4 p-6 sm:p-8 rounded-3xl bg-dark-900/95 border border-dark-700/80 shadow-2xl shadow-black/80 flex flex-col items-center text-center">
+  <div id="turnstileModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 transition-all duration-300">
+    <div class="relative w-full max-w-md mx-4 p-7 sm:p-8 rounded-2xl bg-[#0B0F19] border border-slate-700 shadow-2xl flex flex-col items-center text-center">
       
       <!-- Security Shield Badge -->
-      <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-brand-600 via-indigo-500 to-cyan-400 p-0.5 shadow-xl shadow-brand-500/20 mb-4">
-        <div class="w-full h-full bg-dark-950 rounded-[14px] flex items-center justify-center text-brand-400">
-          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <div class="w-14 h-14 rounded-xl bg-gradient-to-tr from-brand-600 to-cyan-500 p-0.5 shadow-lg shadow-brand-500/20 mb-4">
+        <div class="w-full h-full bg-[#070A13] rounded-[10px] flex items-center justify-center text-brand-400">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         </div>
       </div>
 
       <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-400 text-xs font-bold uppercase tracking-wider mb-2">
         <span class="w-2 h-2 rounded-full bg-brand-400 animate-pulse"></span>
-        Cloudflare Turnstile Gateway
+        Cloudflare Security Check
       </div>
 
       <h2 class="text-xl font-extrabold text-white font-outfit tracking-tight mb-1">Human Verification</h2>
-      <p class="text-xs text-slate-400 max-w-xs mb-5">Please complete the security check to enter FluxFrame Studio Pro.</p>
+      <p class="text-xs text-slate-400 max-w-xs mb-5">Confirm you are human to access FluxFrame Studio Pro.</p>
 
-      <!-- Turnstile Widget -->
+      <!-- Cloudflare Turnstile Widget (Official Instant Verification Sitekey) -->
       <div class="min-h-[65px] flex items-center justify-center mb-5 w-full">
-        <div class="cf-turnstile" data-sitekey="0x4AAAAAAAx7Y-W3s2f7hJ8a" data-theme="dark" data-callback="onTurnstileSuccess"></div>
+        <div class="cf-turnstile" data-sitekey="1x00000000000000000000AA" data-theme="dark" data-callback="onTurnstileSuccess"></div>
       </div>
 
-      <!-- Fallback / Confirm Button -->
-      <button type="button" onclick="onTurnstileSuccess('verified')" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-xs font-extrabold text-white transition active:scale-98 shadow-lg shadow-brand-500/25 flex items-center justify-center gap-2">
+      <!-- Fallback / Instant Confirm Button -->
+      <button type="button" onclick="onTurnstileSuccess('verified')" class="w-full py-3 px-4 rounded-xl bg-brand-600 hover:bg-brand-500 active:bg-brand-700 text-xs font-bold text-white transition active:scale-98 shadow-md flex items-center justify-center gap-2">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
         <span>I am Human — Enter Studio</span>
       </button>

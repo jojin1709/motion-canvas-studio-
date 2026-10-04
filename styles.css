@@ -1,5 +1,30 @@
 /* Custom CSS enhancements on top of Tailwind CSS */
 
+/* Global Clean Dark Input & Dropdown Styling */
+input[type="text"],
+input[type="number"],
+select {
+  background-color: #090d1a !important;
+  color: #ffffff !important;
+  border: 1px solid #1e293b !important;
+}
+
+input[type="text"]:focus,
+select:focus {
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 0 1px #6366f1 !important;
+  outline: none !important;
+}
+
+input[type="text"]::placeholder {
+  color: #475569 !important;
+}
+
+select option {
+  background-color: #090d1a !important;
+  color: #ffffff !important;
+}
+
 /* Custom Scrollbar */
 .custom-scrollbar::-webkit-scrollbar {
   width: 5px;
